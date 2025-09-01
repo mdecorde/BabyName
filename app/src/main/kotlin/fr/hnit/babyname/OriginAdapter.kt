@@ -48,7 +48,7 @@ class OriginAdapter(
         val txtName = newConvertView.findViewById<TextView>(R.id.txtName)
         val checkBox = newConvertView.findViewById<CheckBox>(R.id.checkBox)
 
-        txtName.text = origins[position]
+        txtName.text = Origins.getLocaleOrigin(context, origins[position])
         checkBox.isChecked = checked[position]
 
         newConvertView.setOnClickListener { v: View? ->
