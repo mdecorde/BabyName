@@ -45,16 +45,15 @@ class BabyName(var name: String, var genres: HashSet<String>, var origins: HashS
     companion object {
         private var nextId = 0
 
-        private fun genresToLocale(context: Context, origins: ArrayList<String>): ArrayList<String> {
+        private fun genresToLocale(context: Context, genres: ArrayList<String>): ArrayList<String> {
             val ret = ArrayList<String>()
             var i = 0
-            while (i < origins.size) {
-                when (origins[i]) {
-                    BabyNameDatabase.GENDER_FEMALE -> ret.add(context.getString(R.string.girl))
-                    BabyNameDatabase.GENDER_MALE -> ret.add(context.getString(R.string.boy))
-                    else -> ret.add(origins[i])
-                }
-                i += 1
+            for (genre in genres) {
+                ret.add(when (genre) {
+                    BabyNameDatabase.GENDER_FEMALE -> context.getString(R.string.girl)
+                    BabyNameDatabase.GENDER_MALE -> context.getString(R.string.boy)
+                    else -> genre
+                })
             }
             return ret
         }
@@ -63,11 +62,8 @@ class BabyName(var name: String, var genres: HashSet<String>, var origins: HashS
         // It would be nice to have proper localisation in the future.
         private fun originsToLocale(context: Context, origins: ArrayList<String>): ArrayList<String> {
             val ret = ArrayList<String>()
-            var i = 0
-            while (i < origins.size) {
-                val origin = origins[i]
-                ret.add(origin.substring(0, 1).uppercase(Locale.getDefault()) + origin.substring(1))
-                i += 1
+            for (origin in origins) {
+                ret.add(Origins.getLocaleOrigin(context, origin))
             }
             return ret
         }
