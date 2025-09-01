@@ -1,6 +1,8 @@
 package fr.hnit.babyname
 
 import android.content.Context
+import fr.hnit.babyname.BabyNameDatabase.Companion.GENDER_FEMALE
+import fr.hnit.babyname.BabyNameDatabase.Companion.GENDER_MALE
 import java.io.File
 import java.io.FileOutputStream
 import java.io.ObjectInputStream
@@ -83,17 +85,26 @@ class BabyNameProject() : Serializable {
             return false
         }
 
-        if (genders.isNotEmpty()) {
-            var genderIsOk = false
-            for (genre in name.genres) {
-                if (genders.contains(genre)) {
-                    genderIsOk = true
-                    continue
-                }
-            }
-            if (!genderIsOk) {
+        val selectFemale = (GENDER_FEMALE in genders)
+        val selectMale = (GENDER_MALE in genders)
+        val selectNeutral = !selectFemale && !selectMale
+
+        val isFemale = (GENDER_FEMALE in name.genres)
+        val isMale = (GENDER_MALE in name.genres)
+        val isNeutral = (isFemale && isMale) || (!isFemale && !isMale)
+
+        if (selectNeutral) {
+            if (!isNeutral)
                 return false
-            }
+        } else if (selectFemale) {
+            if (!isFemale)
+                return false
+        } else if (selectMale) {
+            if (!isMale)
+                return false
+        } else {
+            // should not happen
+            return false
         }
 
         if (origins.isNotEmpty()) {
