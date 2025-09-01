@@ -1,5 +1,5 @@
 <resources>
-    <string name="about">BabyName %s\n\nThis application allow you to find out which is your favorite baby name from a collection of +10000 names lexicon arranged by genre and origin (produced by Mike Campbell and Boris New see http://www.lexique.org/public/prenoms.php).\n\t\n\nThis application is entirely open-source any suggestion, help or question is welcomed, please go to https://github.com/mdecorde/BABYNAME. Maintained by Moritz Warning see https://github.com/mwarning </string>
+    <string name="about">Baby Name %s\n\nThis application allow you to find out which is your favorite baby name from a collection of +10000 names lexicon arranged by genre and origin (produced by Mike Campbell and Boris New see http://www.lexique.org/public/prenoms.php).\n\t\n\nThis application is entirely open-source any suggestion, help or question is welcomed, please go to https://github.com/mdecorde/BabyName. Maintained by Moritz Warning see https://github.com/mwarning </string>
     <string name="about_button">About</string>
     <string name="action_cancelsave_babyproject">Cancel</string>
     <string name="action_delete_baby">Delete</string>
@@ -11,7 +11,7 @@
     <string name="action_top_baby">Top 10!</string>
     <string name="all">All</string>
     <string name="all_names_reviewed">All names have been reviewed!</string>
-    <string name="app_name">BabyName</string>
+    <string name="app_name">Baby Name</string>
     <string name="best_match_is" formatted="false">Best match is \'%s\'.</string>
     <string name="boy">Boy</string>
     <string name="boy_name">A boy which name</string>

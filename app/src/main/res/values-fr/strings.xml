@@ -7,7 +7,7 @@
     <string formatted="false" name="no_remaining_loop">Plus de nom à voir (loop=%d). Recommencer un tour avec %d des noms?</string>
     <string formatted="false" name="origin_are">les origines sont %s</string>
     <string formatted="false" name="origin_is">l\'origine est \'%s\'</string>
-    <string name="about">BabyName %s\n\nCette application permet de trouve un nom pour son futur bébé parmis un lexique de plus de 10000 prénoms organisés par genre et origine (produit par Mike Campbell et Boris New, voir http://www.lexique.org/public/prenoms.php).\n\nCette application est entierement libre, pour toute suggestion ou demande d\'aide, veuillez vous rendre sur https://github.com/mdecorde/BABYNAME.\n\n\nMaintenu par Moritz Warning voir https://github.com/mwarning </string>
+    <string name="about">Baby Name %s\n\nCette application permet de trouve un nom pour son futur bébé parmis un lexique de plus de 10000 prénoms organisés par genre et origine (produit par Mike Campbell et Boris New, voir http://www.lexique.org/public/prenoms.php).\n\nCette application est entierement libre, pour toute suggestion ou demande d\'aide, veuillez vous rendre sur https://github.com/mdecorde/BabyName.\n\n\nMaintenu par Moritz Warning voir https://github.com/mwarning </string>
     <string name="about_button">À propos</string>
     <string name="action_cancelsave_babyproject">Annuler</string>
     <string name="action_delete_baby">Effacer</string>
@@ -19,7 +19,7 @@
     <string name="action_top_baby">Top 10 !</string>
     <string name="all">Qui sait?</string>
     <string name="all_names_reviewed">Tous les noms ont été passé en revue</string>
-    <string name="app_name">BabyName</string>
+    <string name="app_name">Baby Name</string>
     <string name="boy">Garçon</string>
     <string name="boy_name">Un garçon dont le nom</string>
     <string name="boy_or_girl_name">Un garçon ou une fille dont le nom</string>
