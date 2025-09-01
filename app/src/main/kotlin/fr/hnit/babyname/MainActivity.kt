@@ -14,6 +14,8 @@ import android.widget.AdapterView.AdapterContextMenuInfo
 import android.widget.ListView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import fr.hnit.babyname.BabyNameDatabase.Companion.GENDER_FEMALE
+import fr.hnit.babyname.BabyNameDatabase.Companion.GENDER_MALE
 
 /*
 The babyname app is free software: you can redistribute it
@@ -208,24 +210,28 @@ class MainActivity : AppCompatActivity() {
 
     fun projectToString(p: BabyNameProject): String {
         var text = ""
-        text += if (p.genders.contains(BabyNameDatabase.GENDER_FEMALE)
-                && p.genders.contains(BabyNameDatabase.GENDER_MALE)) {
+        text += if (GENDER_FEMALE in p.genders && GENDER_MALE in p.genders) {
             getString(R.string.boy_or_girl_name)
-        } else if (p.genders.contains(BabyNameDatabase.GENDER_MALE)) {
+        } else if (GENDER_MALE in p.genders) {
             getString(R.string.boy_name)
-        } else {
+        } else if (GENDER_FEMALE in p.genders) {
             getString(R.string.girl_name)
+        } else {
+            getString(R.string.neutral_name)
         }
 
         // sort origins for display
-        val origins = ArrayList(p.origins)
-        origins.sort()
+        val originsTranslated = ArrayList(
+            p.origins.map { it -> Origins.getLocaleOrigin(applicationContext, it) }
+        )
+
+        originsTranslated.sort()
 
         text += " "
-        text += if (origins.size == 1) {
-            String.format(getString(R.string.origin_is), origins[0])
+        text += if (originsTranslated.size == 1) {
+            String.format(getString(R.string.origin_is), originsTranslated[0])
         } else if (p.origins.size > 1) {
-            String.format(getString(R.string.origin_are), origins)
+            String.format(getString(R.string.origin_are), originsTranslated)
         } else {
             getString(R.string.no_origin)
         }

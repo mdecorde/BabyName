@@ -12,6 +12,8 @@ import android.widget.RadioGroup
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import fr.hnit.babyname.BabyNameDatabase.Companion.GENDER_FEMALE
+import fr.hnit.babyname.BabyNameDatabase.Companion.GENDER_MALE
 import java.util.regex.Pattern
 import java.util.regex.PatternSyntaxException
 
@@ -103,13 +105,14 @@ class EditActivity : AppCompatActivity() {
 
     fun applyFromProject(project: BabyNameProject) {
         val genders = project.genders
-        if (genders.contains(BabyNameDatabase.GENDER_FEMALE)
-                && genders.contains(BabyNameDatabase.GENDER_MALE)) {
-            genderRadio.check(R.id.all_radio)
-        } else if (genders.contains(BabyNameDatabase.GENDER_MALE)) {
-            genderRadio.check(R.id.boy_radio)
+        if (GENDER_FEMALE in genders && GENDER_MALE in genders) {
+            genderRadio.check(R.id.gender_all_radio)
+        } else if (GENDER_MALE in genders) {
+            genderRadio.check(R.id.gender_male_radio)
+        } else if (GENDER_FEMALE in genders) {
+            genderRadio.check(R.id.gender_female_radio)
         } else {
-            genderRadio.check(R.id.girl_radio)
+            genderRadio.check(R.id.gender_neutral_radio)
         }
 
         // set pattern
@@ -145,19 +148,25 @@ class EditActivity : AppCompatActivity() {
         }
 
         // update genders
-        project.genders.clear()
         when (genderRadio.checkedRadioButtonId) {
-            R.id.boy_radio -> {
+            R.id.gender_male_radio -> {
+                project.genders.clear()
                 project.genders.add(BabyNameDatabase.GENDER_MALE)
             }
 
-            R.id.girl_radio -> {
-                project.genders.add(BabyNameDatabase.GENDER_FEMALE)
+            R.id.gender_female_radio -> {
+                project.genders.clear()
+                project.genders.add(GENDER_FEMALE)
             }
 
-            R.id.all_radio -> {
-                project.genders.add(BabyNameDatabase.GENDER_FEMALE)
-                project.genders.add(BabyNameDatabase.GENDER_MALE)
+            R.id.gender_all_radio -> {
+                project.genders.clear()
+                project.genders.add(GENDER_FEMALE)
+                project.genders.add(GENDER_MALE)
+            }
+
+            R.id.gender_neutral_radio -> {
+                project.genders.clear()
             }
         }
 

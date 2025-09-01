@@ -59,22 +59,29 @@
             <RadioButton
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@string/boy"
-                android:id="@+id/boy_radio"
+                android:text="@string/gender_male"
+                android:id="@+id/gender_male_radio"
                 android:checked="false" />
 
             <RadioButton
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@string/girl"
-                android:id="@+id/girl_radio"
+                android:text="@string/gender_female"
+                android:id="@+id/gender_female_radio"
                 android:checked="false" />
 
             <RadioButton
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@string/all"
-                android:id="@+id/all_radio"
+                android:text="@string/gender_neutral"
+                android:id="@+id/gender_neutral_radio"
+                android:checked="false" />
+
+            <RadioButton
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/gender_all"
+                android:id="@+id/gender_all_radio"
                 android:checked="false" />
 
         </RadioGroup>
