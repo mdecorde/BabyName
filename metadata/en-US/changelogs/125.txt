@@ -1,0 +1,2 @@
+* add option for gender neutral names
+* translate origins
