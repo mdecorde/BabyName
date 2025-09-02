@@ -14,8 +14,6 @@ import android.widget.AdapterView.AdapterContextMenuInfo
 import android.widget.ListView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
-import fr.hnit.babyname.BabyNameDatabase.Companion.GENDER_FEMALE
-import fr.hnit.babyname.BabyNameDatabase.Companion.GENDER_MALE
 
 /*
 The Baby Name app is free software: you can redistribute it
@@ -209,15 +207,11 @@ class MainActivity : AppCompatActivity() {
     }
 
     fun projectToString(p: BabyNameProject): String {
-        var text = ""
-        text += if (GENDER_FEMALE in p.genders && GENDER_MALE in p.genders) {
-            getString(R.string.boy_or_girl_name)
-        } else if (GENDER_MALE in p.genders) {
-            getString(R.string.boy_name)
-        } else if (GENDER_FEMALE in p.genders) {
-            getString(R.string.girl_name)
-        } else {
-            getString(R.string.neutral_name)
+        var text = when (p.gender) {
+            BabyNameProject.GenderSelection.ALL -> getString(R.string.boy_or_girl_name)
+            BabyNameProject.GenderSelection.MALE -> getString(R.string.boy_name)
+            BabyNameProject.GenderSelection.FEMALE -> getString(R.string.girl_name)
+            BabyNameProject.GenderSelection.NEUTRAL -> getString(R.string.neutral_name)
         }
 
         // sort origins for display
