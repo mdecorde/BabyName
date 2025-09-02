@@ -53,7 +53,9 @@ class BabyNameDatabase : SparseArray<BabyName>() {
                         origins.remove("")
 
                         if (name.isNotEmpty()) {
-                            val b = BabyName(name, genres, origins)
+                            val isMale = ("m" in genres)
+                            val isFemale = ("f" in genres)
+                            val b = BabyName(name, isMale, isFemale, origins)
                             this@BabyNameDatabase.put(b.id, b)
                         } else {
                             Log.e(this, "Empty baby name in $databaseFileName:$lineNumber: $line")
@@ -80,10 +82,5 @@ class BabyNameDatabase : SparseArray<BabyName>() {
             }
         }
         return all
-    }
-
-    companion object {
-        const val GENDER_MALE: String = "m"
-        const val GENDER_FEMALE: String = "f"
     }
 }

@@ -12,8 +12,6 @@ import android.widget.RadioGroup
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
-import fr.hnit.babyname.BabyNameDatabase.Companion.GENDER_FEMALE
-import fr.hnit.babyname.BabyNameDatabase.Companion.GENDER_MALE
 import java.util.regex.Pattern
 import java.util.regex.PatternSyntaxException
 
@@ -104,16 +102,13 @@ class EditActivity : AppCompatActivity() {
     }
 
     fun applyFromProject(project: BabyNameProject) {
-        val genders = project.genders
-        if (GENDER_FEMALE in genders && GENDER_MALE in genders) {
-            genderRadio.check(R.id.gender_all_radio)
-        } else if (GENDER_MALE in genders) {
-            genderRadio.check(R.id.gender_male_radio)
-        } else if (GENDER_FEMALE in genders) {
-            genderRadio.check(R.id.gender_female_radio)
-        } else {
-            genderRadio.check(R.id.gender_neutral_radio)
+        val selection = when (project.gender) {
+            BabyNameProject.GenderSelection.ALL -> R.id.gender_all_radio
+            BabyNameProject.GenderSelection.MALE -> R.id.gender_male_radio
+            BabyNameProject.GenderSelection.FEMALE -> R.id.gender_female_radio
+            BabyNameProject.GenderSelection.NEUTRAL -> R.id.gender_neutral_radio
         }
+        genderRadio.check(selection)
 
         // set pattern
         patternText.setText(project.pattern.toString())
@@ -147,26 +142,15 @@ class EditActivity : AppCompatActivity() {
             i += 1
         }
 
-        // update genders
-        when (genderRadio.checkedRadioButtonId) {
-            R.id.gender_male_radio -> {
-                project.genders.clear()
-                project.genders.add(BabyNameDatabase.GENDER_MALE)
-            }
-
-            R.id.gender_female_radio -> {
-                project.genders.clear()
-                project.genders.add(GENDER_FEMALE)
-            }
-
-            R.id.gender_all_radio -> {
-                project.genders.clear()
-                project.genders.add(GENDER_FEMALE)
-                project.genders.add(GENDER_MALE)
-            }
-
-            R.id.gender_neutral_radio -> {
-                project.genders.clear()
+        // update gender selection
+        project.gender = when (genderRadio.checkedRadioButtonId) {
+            R.id.gender_male_radio -> BabyNameProject.GenderSelection.MALE
+            R.id.gender_female_radio -> BabyNameProject.GenderSelection.FEMALE
+            R.id.gender_all_radio -> BabyNameProject.GenderSelection.ALL
+            R.id.gender_neutral_radio -> BabyNameProject.GenderSelection.NEUTRAL
+            else -> {
+                Log.w(this, "Unhandled radio button id: ${genderRadio.checkedRadioButtonId}")
+                BabyNameProject.GenderSelection.ALL
             }
         }
 

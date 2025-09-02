@@ -1,8 +1,6 @@
 package fr.hnit.babyname
 
 import android.content.Context
-import fr.hnit.babyname.BabyNameDatabase.Companion.GENDER_FEMALE
-import fr.hnit.babyname.BabyNameDatabase.Companion.GENDER_MALE
 import java.io.File
 import java.io.FileOutputStream
 import java.io.ObjectInputStream
@@ -33,23 +31,29 @@ http://www.gnu.org/licenses
 class BabyNameProject() : Serializable {
     var needSaving = false
     var iD: String = UUID.randomUUID().toString()
-    var genders = HashSet<String>()
+    var gender = GenderSelection.ALL
     var origins = HashSet<String>()
     var pattern: Pattern? = null
     var scores = HashMap<Int, Int>()
     var nexts = mutableListOf<Int>()
     var nextsIndex = 0
 
+    // gender selection
+    enum class GenderSelection {
+        ALL,
+        MALE,
+        FEMALE,
+        NEUTRAL
+    }
+
     init {
-        genders.add(BabyNameDatabase.GENDER_MALE)
-        genders.add(BabyNameDatabase.GENDER_FEMALE)
         pattern = Pattern.compile(".*")
         reset()
     }
 
     fun cloneProject(): BabyNameProject {
         val project = BabyNameProject()
-        project.genders = genders.toHashSet()
+        project.gender = gender
         project.origins = origins.toHashSet()
         project.pattern = pattern
         project.scores = HashMap(scores)
@@ -85,37 +89,26 @@ class BabyNameProject() : Serializable {
             return false
         }
 
-        val selectFemale = (GENDER_FEMALE in genders)
-        val selectMale = (GENDER_MALE in genders)
-        val selectNeutral = !selectFemale && !selectMale
+        val genderMatches = when (gender) {
+            GenderSelection.ALL -> true
+            GenderSelection.MALE -> name.isMale
+            GenderSelection.FEMALE -> name.isFemale
+            GenderSelection.NEUTRAL -> (name.isMale == name.isFemale)
+        }
 
-        val isFemale = (GENDER_FEMALE in name.genres)
-        val isMale = (GENDER_MALE in name.genres)
-        val isNeutral = (isFemale && isMale) || (!isFemale && !isMale)
-
-        if (selectNeutral) {
-            if (!isNeutral)
-                return false
-        } else if (selectFemale) {
-            if (!isFemale)
-                return false
-        } else if (selectMale) {
-            if (!isMale)
-                return false
-        } else {
-            // should not happen
+        if (!genderMatches) {
             return false
         }
 
         if (origins.isNotEmpty()) {
-            var originIsOk = false
+            var originMatches = false
             for (origin in name.origins) {
                 if (origins.contains(origin)) {
-                    originIsOk = true
+                    originMatches = true
                     continue
                 }
             }
-            if (!originIsOk) {
+            if (!originMatches) {
                 return false
             }
         }

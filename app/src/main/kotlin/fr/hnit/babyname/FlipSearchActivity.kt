@@ -141,11 +141,7 @@ open class FlipSearchActivity : AppCompatActivity() {
         } else {
             nameText.text = babyName.name
 
-            if (project.genders.isNotEmpty() || project.origins.size > 1) {
-                extraText.text = babyName.getMetaString(applicationContext)
-            } else {
-                extraText.text = ""
-            }
+            extraText.text = babyName.getMetaString(applicationContext)
 
             progressCounterText.text = String.format("(%d/%d)", project.nextsIndex + 1, project.nexts.size)
             progressPercentText.text = String.format("%d%%", (100 * project.nextsIndex) / project.nexts.size)

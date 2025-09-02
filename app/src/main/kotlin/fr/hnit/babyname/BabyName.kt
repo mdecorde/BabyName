@@ -2,7 +2,6 @@ package fr.hnit.babyname
 
 import android.content.Context
 import java.io.Serializable
-import java.util.Locale
 
 /*
 The Baby Name app is free software: you can redistribute it
@@ -22,21 +21,19 @@ Public License along with the TXM platform. If not, see
 http://www.gnu.org/licenses
 */
 
-class BabyName(var name: String, var genres: HashSet<String>, var origins: HashSet<String>) : Serializable {
+class BabyName(var name: String, var isMale: Boolean, var isFemale: Boolean, var origins: HashSet<String>) : Serializable {
     var id = nextId++
     var soundex = generateSoundex(name)
 
     fun getMetaString(context: Context): String {
-        val genres = ArrayList(genres)
-        val origins = ArrayList(origins)
-        genres.sort()
-        origins.sort()
         var meta = ""
-        if (genres.isNotEmpty()) {
-            meta += genresToLocale(context, genres).toString()
+        if (isMale || isFemale) {
+            meta += genresToLocale(context, isMale, isFemale).toString()
+            meta += " "
         }
-        meta += " "
         if (origins.isNotEmpty()) {
+            val origins = ArrayList(origins)
+            origins.sort()
             meta += originsToLocale(context, origins).toString()
         }
         return meta
@@ -45,16 +42,17 @@ class BabyName(var name: String, var genres: HashSet<String>, var origins: HashS
     companion object {
         private var nextId = 0
 
-        private fun genresToLocale(context: Context, genres: ArrayList<String>): ArrayList<String> {
+        private fun genresToLocale(context: Context, isMale: Boolean, isFemale: Boolean): ArrayList<String> {
             val ret = ArrayList<String>()
-            var i = 0
-            for (genre in genres) {
-                ret.add(when (genre) {
-                    BabyNameDatabase.GENDER_FEMALE -> context.getString(R.string.girl)
-                    BabyNameDatabase.GENDER_MALE -> context.getString(R.string.boy)
-                    else -> genre
-                })
+
+            if (isFemale) {
+                ret.add(context.getString(R.string.girl))
             }
+
+            if (isMale) {
+                ret.add(context.getString(R.string.boy))
+            }
+
             return ret
         }
 
