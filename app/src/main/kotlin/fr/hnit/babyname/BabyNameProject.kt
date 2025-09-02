@@ -121,11 +121,11 @@ class BabyNameProject() : Serializable {
 
     fun dropLast() {
         if (nexts.size > 10) {
-            val amountToRemove = ((BabyNameProject.DROP_RATE_PERCENT *  nexts.size) / 100)
+            val amountToRemove = ((DROP_RATE_PERCENT *  nexts.size) / 100)
 
             val removed = nexts.subList(nexts.size - amountToRemove, nexts.size)
 
-            // update scores
+            // keep scores updated
             for (i in removed) {
                 scores.remove(i)
             }
