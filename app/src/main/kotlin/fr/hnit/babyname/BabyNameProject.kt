@@ -183,16 +183,14 @@ class BabyNameProject() : Serializable {
             }
         }
         nexts.shuffle()
+
+        nextsIndex = 0
     }
 
     fun reset() {
         scores.clear()
 
         rebuildNexts()
-
-        nexts.shuffle()
-
-        nextsIndex = 0
 
         setNeedToBeSaved(true)
     }
