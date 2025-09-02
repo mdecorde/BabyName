@@ -3,9 +3,9 @@ package fr.hnit.babyname
 import android.content.DialogInterface
 import android.graphics.Color
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.preference.PreferenceManager
-import android.view.MotionEvent
-import android.view.View
 import android.widget.Button
 import android.widget.ImageView
 import android.widget.LinearLayout
@@ -78,13 +78,6 @@ open class FlipSearchActivity : AppCompatActivity() {
         removeButton.setOnClickListener { removeName() }
         previousButton.setOnClickListener { previousName() }
 
-        rateBar.setOnTouchListener { view: View?, motionEvent: MotionEvent ->
-            if (goToNext && motionEvent.action == MotionEvent.ACTION_UP) {
-                nextName()
-            }
-            false
-        }
-
         val index = intent.getIntExtra(MainActivity.PROJECT_EXTRA, 0)
         if (index >= 0 && MainActivity.projects.size > index) {
             project = MainActivity.projects[index]
@@ -102,8 +95,6 @@ open class FlipSearchActivity : AppCompatActivity() {
                 ratingBar: RatingBar, rating: Float, fromUser: Boolean ->
             val babyName = currentBabyName
             if (fromUser && babyName != null) {
-                currentBabyName
-
                 val score = (rating * 2.0F).toInt()
                 project.scores[babyName.id] = score
 
@@ -118,6 +109,14 @@ open class FlipSearchActivity : AppCompatActivity() {
                 ).show()
 
                 project.setNeedToBeSaved(true)
+
+                if (goToNext) {
+                    Handler(Looper.getMainLooper()).postDelayed({
+                        if (babyName == currentBabyName) {
+                            nextName()
+                        }
+                    }, 500)
+                }
             }
         }
     }
