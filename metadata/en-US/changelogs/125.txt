@@ -1,2 +1,4 @@
 * add option for gender neutral names
 * translate origins
+* fix setting to advance to next name on rating
+* fix negative name count if filter is changed later
