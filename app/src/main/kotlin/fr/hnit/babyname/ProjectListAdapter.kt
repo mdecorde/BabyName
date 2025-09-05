@@ -1,3 +1,8 @@
+/*
+* Copyright (C) 2025 Baby Name Developers
+* SPDX-License-Identifier: GPL-3.0-or-later
+*/
+
 package fr.hnit.babyname
 
 import android.content.Context
@@ -7,24 +12,6 @@ import android.view.ViewGroup
 import android.widget.ArrayAdapter
 import android.widget.ImageButton
 import android.widget.TextView
-
-/*
-The Baby Name app is free software: you can redistribute it
-and/or modify it under the terms of the GNU General Public
-License as published by the Free Software Foundation,
-either version 2 of the License, or (at your option) any
-later version.
-
-The Baby Name app is distributed in the hope that it will be
-useful, but WITHOUT ANY WARRANTY; without even the implied
-warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
-PURPOSE. See the GNU General Public License for more
-details.
-
-You should have received a copy of the GNU General
-Public License along with the TXM platform. If not, see
-http://www.gnu.org/licenses
-*/
 
 class ProjectListAdapter(private val main: MainActivity, private val itemsArrayList: ArrayList<BabyNameProject>) :
     ArrayAdapter<BabyNameProject>(main, R.layout.item_project, itemsArrayList) {
