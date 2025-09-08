@@ -25,7 +25,7 @@ class ProjectListAdapter(private val main: MainActivity, private val itemsArrayL
         val rowView = inflater.inflate(R.layout.item_project, parent, false)
 
         val text = rowView.findViewById<TextView>(R.id.list_text)
-        text.text = main.projectToString(project)
+        text.text = main.projectToDescription(project)
 
         rowView.findViewById<ImageButton>(R.id.list_scroll_find)
             .setOnClickListener { main.doScrollSearch(project) }

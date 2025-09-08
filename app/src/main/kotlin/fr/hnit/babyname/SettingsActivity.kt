@@ -6,15 +6,22 @@
 package fr.hnit.babyname
 
 import android.os.Bundle
-import android.preference.PreferenceActivity
+import android.widget.CompoundButton
+import com.google.android.material.switchmaterial.SwitchMaterial
+import androidx.appcompat.app.AppCompatActivity
 
-class SettingsActivity : PreferenceActivity() {
-    public override fun onCreate(savedInstanceState: Bundle?) {
+class SettingsActivity : AppCompatActivity() {
+    override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        setContentView(R.layout.activity_settings)
+        setTitle(R.string.menu_settings)
 
-        // Display the fragment as the main content.
-        fragmentManager.beginTransaction()
-            .replace(android.R.id.content, SettingsFragment())
-            .commit()
+        findViewById<SwitchMaterial>(R.id.nextOnRatingSwitch).apply {
+            isChecked = MainActivity.settings.nextOnRating
+            setOnCheckedChangeListener { _: CompoundButton?, isChecked: Boolean ->
+                MainActivity.settings.nextOnRating = isChecked
+                MainActivity.settings.save(applicationContext)
+            }
+        }
     }
 }

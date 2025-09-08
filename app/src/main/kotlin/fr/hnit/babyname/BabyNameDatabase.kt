@@ -5,68 +5,200 @@
 
 package fr.hnit.babyname
 
-import android.content.Context
-import android.util.SparseArray
+import android.app.Activity
 import java.io.BufferedReader
 import java.io.IOException
 import java.io.InputStreamReader
 
-class BabyNameDatabase : SparseArray<BabyName>() {
-    fun initialize(ctx: Context) {
-        val thread: Thread = object : Thread() {
-            override fun run() {
-                try {
-                    val databaseFileName = "babynames.csv"
-                    val reader =
-                        BufferedReader(InputStreamReader(ctx.assets.open(databaseFileName)))
-                    var lineNumber = 0
-                    while (reader.ready()) {
-                        lineNumber += 1
-                        val line = reader.readLine()
-                        val items = line.split(";".toRegex()).toTypedArray()
-                        if (items.size != 3) {
-                            Log.e(this, "Failed to parse line in $databaseFileName:$lineNumber: $line")
-                            break
-                        }
+class BabyNameDatabase {
+    private var allNames = arrayListOf<BabyName>()
 
-                        val name = items[0]
-                        val genres =
-                            HashSet(listOf(*items[1].split(",".toRegex()).toTypedArray()))
-                        val origins =
-                            HashSet(listOf(*items[2].split(",".toRegex()).toTypedArray()))
+    fun initialize(activity: Activity) {
+        try {
+            val databaseFileName = "babynames.csv"
+            val csvData = BufferedReader(InputStreamReader(activity.assets.open(databaseFileName)))
+                .use(BufferedReader::readText)
+            setNames(importCSV(csvData, false))
 
-                        // remove empty entries
-                        genres.remove("")
-                        origins.remove("")
+            Log.d(this, "Loaded ${allNames.size} names")
+        } catch (e: IOException) {
+            e.printStackTrace()
+        }
+    }
 
-                        if (name.isNotEmpty()) {
-                            val isMale = ("m" in genres)
-                            val isFemale = ("f" in genres)
-                            val b = BabyName(name, isMale, isFemale, origins)
-                            this@BabyNameDatabase.put(b.id, b)
-                        } else {
-                            Log.e(this, "Empty baby name in $databaseFileName:$lineNumber: $line")
-                        }
-                    }
-                    reader.close()
+    fun get(index: Int): BabyName {
+        //Log.d(this, "index: $index, size: ${allNames.size}")
+        return allNames[index]
+    }
 
-                    Log.d(this, "Loaded " + this@BabyNameDatabase.size() + " names")
-                } catch (e: IOException) {
-                    e.printStackTrace()
-                }
+    fun size(): Int {
+        return allNames.size
+    }
+
+    fun addNames(newNames: ArrayList<BabyName>) {
+        val mergedNames = arrayListOf<BabyName>()
+        mergedNames.addAll(allNames)
+        mergedNames.addAll(newNames)
+        mergedNames.sortBy({it.name})
+        mergedNames.distinctBy { getBabyNameLine(it) }
+        setNames(mergedNames)
+    }
+
+    // The input is expected to be a sorted and distinct list
+    fun setNames(newNames: ArrayList<BabyName>) {
+        // record id changes
+        val map = HashMap<Int, Int>()
+
+        for (oldIndex in allNames.indices) {
+            val oldName = allNames[oldIndex]
+            val newIndex = newNames.binarySearchBy(oldName.name) { it.name }
+            if (oldIndex != newIndex) {
+                map[oldIndex] = newIndex
             }
         }
-        thread.start()
+
+        // fix all indices
+        for (id in newNames.indices) {
+            newNames[id].id = id
+        }
+
+        // update projects
+        for (project in MainActivity.projects) {
+            project.updateIDs(map)
+        }
+
+        // set new names as last step
+        allNames = newNames
+    }
+
+    private fun getExcerpt(str: String, max: Int = 32): String {
+        if (str.length < max) {
+            return str
+        } else {
+            return str.substring(0, max) + "..."
+        }
+    }
+
+    fun importCSV(text: String, external: Boolean = true): ArrayList<BabyName> {
+        val names = arrayListOf<BabyName>()
+        val lineSet = hashSetOf<String>()
+        var lineNumber = 0
+
+        var offset = 0
+        var run = true
+        while (run) {
+            val lineEnd = text.indexOf("\n", offset)
+            val line = if (lineEnd >= 0) {
+                val lineStart = offset
+                offset = lineEnd + 1
+                text.substring(lineStart, lineEnd)
+            } else if (offset <= text.length) {
+                run = false
+                text.substring(offset)
+            } else {
+                break
+            }
+
+            if (line.isEmpty()) {
+                continue
+            }
+
+            lineNumber += 1
+            val items = line.split(";")
+            if (items.size != 3) {
+                throw Exception("Failed to parse line $lineNumber: ${getExcerpt(line)}")
+            }
+
+            val name = items[0]
+            val genres = HashSet(items[1].split(","))
+            val origins = HashSet(items[2].split(","))
+
+            // remove empty entries
+            genres.remove("")
+            origins.remove("")
+
+            if (external) {
+                if (name.isEmpty() || name != name.trim()) {
+                    throw Exception("Invalid name in line $lineNumber: ${getExcerpt(line)}")
+                }
+
+                for (genre in genres) {
+                    if (genre.isEmpty() || genre != genre.trim() || (genre != "m" && genre != "f")) {
+                        throw Exception("Invalid genre in line $lineNumber: ${getExcerpt(line)}")
+                    }
+                }
+
+                for (origin in origins) {
+                    if (origin.isEmpty() || origin != origin.trim()) {
+                        throw Exception("Invalid origin in line $lineNumber: ${getExcerpt(line)}")
+                    }
+                }
+            }
+
+            val isMale = ("m" in genres)
+            val isFemale = ("f" in genres)
+            val item = BabyName(names.size, name, isMale, isFemale, origins)
+
+            if (external) {
+                // check for duplicate lines
+                val lineHash = getBabyNameLine(item)
+                if (lineHash in lineSet) {
+                    throw Exception("Duplicate name in line $lineNumber: ${getExcerpt(line)} ($lineHash)")
+                } else {
+                    lineSet.add(lineHash)
+                }
+            }
+
+            names.add(item)
+        }
+
+        if (external) {
+            names.sortBy({getBabyNameLine(it)})
+        }
+
+        return names
+    }
+
+    // Hash BabyName object to find duplicates.
+    private fun getBabyNameLine(name: BabyName) : String {
+        return buildString {
+            append(name.name)
+            append(";")
+            if (name.isMale && name.isFemale) {
+                append("m,f");
+            } else if (name.isMale) {
+                append("m")
+            } else if (name.isFemale) {
+                append("f")
+            }
+            append(";")
+            append(name.origins.joinToString(separator = ","))
+        }
+    }
+
+    fun exportCSV(): String {
+        return buildString {
+            for (name in allNames ) {
+                append(name.name)
+                append(";")
+                if (name.isMale && name.isFemale) {
+                    append("m,f");
+                } else if (name.isMale) {
+                    append("m")
+                } else if (name.isFemale) {
+                    append("f")
+                }
+                append(";")
+                append(name.origins.joinToString(separator = ","))
+                append("\n")
+            }
+        }
     }
 
     fun getAllOrigins(): HashSet<String> {
         val all = HashSet<String>()
-        val n = this.size()
-        for (i in 0 until n) {
-            val entry = this[i]
-            if (entry != null) {
-                all.addAll(entry.origins)
-            }
+        for (name in allNames) {
+            all.addAll(name.origins)
         }
         return all
     }

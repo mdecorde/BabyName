@@ -7,26 +7,40 @@ package fr.hnit.babyname
 
 import android.graphics.Color
 import android.os.Bundle
+import android.text.SpannableString
+import android.text.Spanned
+import android.text.style.BackgroundColorSpan
 import android.view.View
 import android.widget.Button
+import android.widget.EditText
+import android.widget.TextView
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.widget.doOnTextChanged
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.snackbar.Snackbar
 
-open class ScrollSearchActivity : AppCompatActivity() {
+class ScrollSearchActivity : AppCompatActivity() {
     private lateinit var project: BabyNameProject
     private lateinit var recyclerView: RecyclerView
     private lateinit var scrollAdapter: ScrollSearchAdapter
+    private lateinit var sortPatternTextView: EditText
+    private lateinit var counterTextView: TextView
     private lateinit var dropButton: Button
     private lateinit var sortButton: Button
+    private var nexts = ArrayList<Int>()
+    private var scores = HashMap<Int, Float>()
+    private var needSaving = false
+    private var sortPattern = emptyList<String>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_scroll_search)
 
+        sortPatternTextView = findViewById(R.id.filter_text)
+        counterTextView = findViewById(R.id.counter_text)
         dropButton = findViewById(R.id.dropButton)
         sortButton = findViewById(R.id.sortButton)
         recyclerView = findViewById(R.id.recyclerview)
@@ -41,11 +55,15 @@ open class ScrollSearchActivity : AppCompatActivity() {
             return
         }
 
-        sortNames()
+        // create a copy
+        nexts = ArrayList(project.nexts)
+        scores = HashMap(project.scores)
 
-        scrollAdapter = ScrollSearchAdapter(this, project)
+        scrollAdapter = ScrollSearchAdapter(this, nexts, scores)
 
         recyclerView.adapter = scrollAdapter
+
+        sortNexts()
 
         dropButton.text = String.format(getString(R.string.button_drop_percent), BabyNameProject.DROP_RATE_PERCENT)
         dropButton.setOnClickListener {
@@ -53,12 +71,17 @@ open class ScrollSearchActivity : AppCompatActivity() {
         }
 
         sortButton.setOnClickListener {
-            sortNames()
-            scrollAdapter.notifyDataSetChanged()
-            recyclerView.scrollToPosition(0)
+            sortNexts()
         }
 
-        if (project.nexts.size > 10) {
+        sortPatternTextView.doOnTextChanged { text, start, count, after ->
+            //Log.d(this, text.toString())
+            sortPattern = text.toString().split("\\s".toRegex())
+
+            sortNexts()
+        }
+
+        if (nexts.size > 10) {
             dropButton.visibility = View.VISIBLE
         } else {
             dropButton.visibility = View.GONE
@@ -79,11 +102,11 @@ open class ScrollSearchActivity : AppCompatActivity() {
             override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
                 if (direction == ItemTouchHelper.LEFT) {
                     val position = viewHolder.adapterPosition
-                    val nameId = project.nexts.removeAt(position)
-                    val scoreBackup = project.scores.remove(nameId)
+                    val nameId = nexts.removeAt(position)
+                    val scoreBackup = scores.remove(nameId)
 
-                    val needSavingBackup =  project.needSaving
-                    project.needSaving = true
+                    val needSavingBackup =  needSaving
+                    needSaving = true
 
                     scrollAdapter.notifyItemRemoved(position)
 
@@ -93,10 +116,10 @@ open class ScrollSearchActivity : AppCompatActivity() {
                         Snackbar.LENGTH_LONG
                     )
                     snackbar.setAction(R.string.undo) {
-                        project.nexts.add(position, nameId)
-                        project.needSaving = needSavingBackup
+                        nexts.add(position, nameId)
+                        needSaving = needSavingBackup
                         if (scoreBackup != null) {
-                            project.scores[nameId] = scoreBackup
+                            scores[nameId] = scoreBackup
                         }
                         recyclerView.scrollToPosition(position)
                         scrollAdapter.notifyItemInserted(position)
@@ -110,12 +133,12 @@ open class ScrollSearchActivity : AppCompatActivity() {
     }
 
     private fun dropDialog() {
-        val amountToRemove = ((BabyNameProject.DROP_RATE_PERCENT * project.nexts.size) / 100)
+        val amountToRemove = ((BabyNameProject.DROP_RATE_PERCENT * nexts.size) / 100)
 
         val builder = AlertDialog.Builder(this)
 
         builder.setTitle(R.string.dialog_drop_title)
-        builder.setMessage(String.format(getString(R.string.dialog_drop_message), amountToRemove, project.nexts.size))
+        builder.setMessage(String.format(getString(R.string.dialog_drop_message), amountToRemove, nexts.size))
 
         builder.setPositiveButton(R.string.yes) { dialog, _ ->
             project.dropLast()
@@ -131,23 +154,33 @@ open class ScrollSearchActivity : AppCompatActivity() {
     }
 
     fun onRatingChangeListener(babyName: BabyName, rating: Float) {
-        val newScore = (rating * 2.0F).toInt()
-        val oldScore = project.scores[babyName.id] ?: 0
-        if (newScore != oldScore) {
+        val oldRating = scores[babyName.id] ?: 0F
+        if (rating != oldRating) {
             //Log.d(this, "rating changed for ${babyName.name}: $oldScore => $newScore")
-            project.scores[babyName.id] = newScore
-            project.setNeedToBeSaved(true)
+            scores[babyName.id] = rating
+            needSaving = true
         }
     }
 
+    // for sorting
+    private fun getMatchPercent(value: String, patterns: List<String>): Int {
+        if (patterns.isEmpty()) {
+            return 0
+        } else {
+            val matches = getMatches(value, patterns)
+            return ((10000 * matches.fold(0){ acc, next -> acc + next.length }) / value.length) / 100
+        }
+    }
+
+    // for sorting
     private fun getOriginScore(target: BabyName): Int {
         var maxScore = 0
-        for (id in project.scores.keys) {
+        for (id in scores.keys) {
             var score = 0
             val source = MainActivity.database.get(id)
             for (targetOrigin in target.origins) {
-                if (source.origins.contains(targetOrigin)) {
-                    score += project.scores[id] ?: 0
+                if (targetOrigin in source.origins) {
+                    score += project.getIntScore(id)
                 }
             }
 
@@ -158,12 +191,13 @@ open class ScrollSearchActivity : AppCompatActivity() {
         return maxScore
     }
 
+    // for sorting
     private fun getSoundexScore(target: BabyName): Int {
         var maxScore = 0
-        for (id in project.scores.keys) {
+        for (id in scores.keys) {
             val source = MainActivity.database.get(id)
             if (target.soundex == source.soundex) {
-                val score = project.scores[id] ?: 0
+                val score = project.getIntScore(id)
                 if (score > maxScore) {
                     maxScore = score
                 }
@@ -172,33 +206,112 @@ open class ScrollSearchActivity : AppCompatActivity() {
         return maxScore
     }
 
-    private fun sortNames() {
-        project.nexts.sortWith { i: Int, j: Int ->
+    // Sort names by match length first, rating score second, soundex score third
+    private fun sortNexts() {
+        nexts.sortWith { i: Int, j: Int ->
             val a = MainActivity.database.get(i)
             val b = MainActivity.database.get(j)
 
-            val aScore = project.scores[a.id] ?: 0
-            val bScore = project.scores[b.id] ?: 0
+            val aMatchLength = getMatchPercent(a.name, sortPattern)
+            val bMatchLength = getMatchPercent(b.name, sortPattern)
 
-            if (aScore != bScore) {
-                return@sortWith bScore - aScore;
+            if (aMatchLength != bMatchLength) {
+                return@sortWith (bMatchLength - aMatchLength)
             } else {
-                val aSoundexScore = getSoundexScore(a)
-                val bSoundexScore = getSoundexScore(b)
+                val aScore = project.getIntScore(a.id)
+                val bScore = project.getIntScore(b.id)
 
-                if (aSoundexScore != bSoundexScore) {
-                    return@sortWith bSoundexScore - aSoundexScore
+                if (aScore != bScore) {
+                    return@sortWith (bScore - aScore)
                 } else {
-                    val aOriginScore = getOriginScore(a)
-                    val bOriginScore = getOriginScore(b)
-                    return@sortWith bOriginScore - aOriginScore
+                    val aSoundexScore = getSoundexScore(a)
+                    val bSoundexScore = getSoundexScore(b)
+
+                    if (aSoundexScore != bSoundexScore) {
+                        return@sortWith bSoundexScore - aSoundexScore
+                    } else {
+                        val aOriginScore = getOriginScore(a)
+                        val bOriginScore = getOriginScore(b)
+                        return@sortWith (bOriginScore - aOriginScore)
+                    }
                 }
             }
         }
+
+        counterTextView.text = if (sortPattern.isEmpty()) {
+            nexts.size.toString()
+        } else {
+            var counter = 0
+            for (next in nexts) {
+                val item = MainActivity.database.get(next)
+                if (isMatch(item.name, sortPattern)) {
+                    counter += 1
+                }
+            }
+            counter.toString()
+        }
+
+        scrollAdapter.notifyDataSetChanged()
+        recyclerView.scrollToPosition(0)
     }
 
     public override fun onStop() {
         super.onStop()
-        project.setNeedToBeSaved(true)
+        project.nexts = nexts
+        project.scores = scores
+        project.setNeedToBeSaved(needSaving)
+    }
+
+    fun getHighlightedName(name: String): SpannableString {
+        val ss = SpannableString(name)
+        if (sortPattern.isEmpty()) {
+            return ss
+        } else {
+            val matches = getMatches(name, sortPattern)
+            for (m in matches) {
+                ss.setSpan(BackgroundColorSpan(Color.YELLOW), m.begin, m.begin + m.length, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+            }
+            return ss
+        }
+    }
+
+    companion object {
+        data class Match(val begin: Int, val length: Int)
+
+        private fun isMatch(value: String, patterns: List<String>): Boolean {
+            for (p in patterns) {
+                if (value.indexOf(p) == -1) {
+                    return false
+                }
+            }
+            return true
+        }
+
+        // return array of matching ranges as array of begin,length pairs
+        private fun getMatches(value: String, patterns: List<String>): List<Match> {
+            // find matching ranges
+            val matches = mutableListOf<Match>()
+            for (p in patterns) {
+                val i = value.indexOf(p)
+                if (i == -1) return emptyList()
+                matches.add(Match(i, p.length))
+            }
+
+            matches.sortBy { it.begin  }
+
+            // merge overlapping ranges
+            var prev : Match? = null
+            val ranges = mutableListOf<Match>()
+            for (m in matches) {
+                if (prev != null && m.begin <= prev.begin + prev.length) {
+                    val length = prev.length.coerceAtLeast(m.begin + m.length - prev.begin);
+                    prev = Match(prev.begin, length)
+                } else {
+                    ranges.add(m)
+                    prev = m
+                }
+            }
+            return ranges
+        }
     }
 }

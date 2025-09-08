@@ -1,0 +1,4 @@
+* fix potential crash when starting app
+* allow search in flip search
+* allow add/or operation for origins
+ 

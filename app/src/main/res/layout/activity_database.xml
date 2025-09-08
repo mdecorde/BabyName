@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <LinearLayout
+        android:layout_gravity="center"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:gravity="center"
+        android:orientation="vertical" >
+
+        <Button
+            android:id="@+id/ExportButton"
+            android:layout_width="160dp"
+            android:layout_height="wrap_content"
+            android:layout_margin="14dp"
+            android:backgroundTint="@color/colorPrimary"
+            android:textSize="20sp"
+            android:layout_weight="1"
+            android:text="@string/button_export" />
+
+        <Button
+            android:id="@+id/ImportMergeButton"
+            android:layout_width="160dp"
+            android:layout_height="wrap_content"
+            android:layout_margin="14dp"
+            android:backgroundTint="@color/colorPrimary"
+            android:textSize="20sp"
+            android:layout_weight="1"
+            android:text="@string/button_import_merge" />
+
+        <Button
+            android:id="@+id/ImportReplaceButton"
+            android:layout_width="160dp"
+            android:layout_height="wrap_content"
+            android:backgroundTint="@color/colorPrimary"
+            android:layout_margin="14dp"
+            android:textSize="20sp"
+            android:layout_weight="1"
+            android:text="@string/button_import_replace" />
+
+    </LinearLayout>
+
+</LinearLayout>

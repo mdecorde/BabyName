@@ -8,44 +8,30 @@
         android:label="@string/app_name"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name="fr.hnit.babyname.MainActivity" android:exported="true">
+        <activity android:name=".MainActivity" android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
         <activity
-            android:name="fr.hnit.babyname.EditActivity"
-            android:noHistory="true" android:exported="false">
-            <meta-data
-                android:name="android.support.PARENT_ACTIVITY"
-                android:value="fr.hnit.babyname.MainActivity" />
-        </activity>
+            android:name=".EditActivity"
+            android:parentActivityName=".MainActivity" />
         <activity
-            android:name="fr.hnit.babyname.FlipSearchActivity"
-            android:noHistory="true" android:exported="false">
-            <meta-data
-                android:name="android.support.PARENT_ACTIVITY"
-                android:value="fr.hnit.babyname.MainActivity" />
-        </activity>
-        <activity android:name=".ScrollSearchActivity" android:exported="false">
-            <meta-data
-                android:name="android.support.PARENT_ACTIVITY"
-                android:value="fr.hnit.babyname.MainActivity" />
-        </activity>
+            android:name=".FlipSearchActivity"
+            android:parentActivityName=".MainActivity" />
         <activity
-            android:name="fr.hnit.babyname.SettingsActivity"
-            android:noHistory="true" android:exported="false">
-            <meta-data
-                android:name="android.support.PARENT_ACTIVITY"
-                android:value="fr.hnit.babyname.MainActivity" />
-        </activity>
-        <activity android:name=".AboutActivity" android:exported="false">
-            <meta-data
-                android:name="android.support.PARENT_ACTIVITY"
-                android:value="fr.hnit.babyname.MainActivity" />
-        </activity>
+            android:name=".ScrollSearchActivity"
+            android:parentActivityName=".MainActivity" />
+        <activity
+            android:name=".SettingsActivity"
+            android:parentActivityName=".MainActivity" />
+        <activity
+            android:name=".DatabaseActivity"
+            android:parentActivityName=".MainActivity" />
+        <activity
+            android:name=".AboutActivity"
+            android:parentActivityName=".MainActivity" />
     </application>
 
 </manifest>

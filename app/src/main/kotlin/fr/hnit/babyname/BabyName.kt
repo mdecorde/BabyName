@@ -8,8 +8,7 @@ package fr.hnit.babyname
 import android.content.Context
 import java.io.Serializable
 
-class BabyName(var name: String, var isMale: Boolean, var isFemale: Boolean, var origins: HashSet<String>) : Serializable {
-    var id = nextId++
+class BabyName(var id: Int, var name: String, var isMale: Boolean, var isFemale: Boolean, var origins: HashSet<String>) : Serializable {
     var soundex = generateSoundex(name)
 
     fun getMetaString(context: Context): String {
@@ -27,8 +26,6 @@ class BabyName(var name: String, var isMale: Boolean, var isFemale: Boolean, var
     }
 
     companion object {
-        private var nextId = 0
-
         private fun genresToLocale(context: Context, isMale: Boolean, isFemale: Boolean): ArrayList<String> {
             val ret = ArrayList<String>()
 

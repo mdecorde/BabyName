@@ -3,13 +3,12 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_margin="8dp">
+    android:layout_margin="10dp">
 
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:padding="8dp">
+        android:orientation="vertical">
 
         <LinearLayout
             android:id="@+id/title_layout"
@@ -22,6 +21,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="match_parent"
                 android:layout_gravity="start"
+                android:layout_marginStart="8dp"
                 android:gravity="center"
                 android:text="1."
                 android:textSize="20sp"
@@ -56,6 +56,7 @@
             android:layout_centerHorizontal="true"
             android:text="[extra]"
             android:textSize="16sp"
+            android:layout_marginBottom="5dp"
             android:textStyle="bold" />
 
     </RelativeLayout>

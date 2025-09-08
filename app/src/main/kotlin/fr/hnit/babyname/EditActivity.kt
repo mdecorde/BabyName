@@ -24,6 +24,7 @@ class EditActivity : AppCompatActivity() {
     lateinit var project: BabyNameProject
     lateinit var adapter: OriginAdapter
     lateinit var originsListView: ListView
+    lateinit var originsLogicRadio: RadioGroup
     lateinit var genderRadio: RadioGroup
     lateinit var patternText: EditText
     lateinit var counterText: TextView
@@ -35,6 +36,7 @@ class EditActivity : AppCompatActivity() {
         setContentView(R.layout.activity_edit)
 
         originsListView = findViewById(R.id.origins_list)
+        originsLogicRadio = findViewById(R.id.origins_logic_radio)
         patternText = findViewById(R.id.pattern_text)
         counterText = findViewById(R.id.counter_text)
         genderRadio = findViewById(R.id.gender_radio)
@@ -75,6 +77,12 @@ class EditActivity : AppCompatActivity() {
         }
         originsListView.adapter = adapter
 
+        originsLogicRadio.setOnCheckedChangeListener { _: RadioGroup?, _: Int ->
+            if (loadFinished) {
+                updateNameCounter()
+            }
+        }
+
         val projectIndex = intent.getIntExtra(MainActivity.PROJECT_EXTRA, -1)
         project = if (projectIndex == -1) {
             BabyNameProject()
@@ -89,13 +97,19 @@ class EditActivity : AppCompatActivity() {
     }
 
     fun applyFromProject(project: BabyNameProject) {
-        val selection = when (project.gender) {
+        val genderSelection = when (project.gender) {
             BabyNameProject.GenderSelection.ALL -> R.id.gender_all_radio
             BabyNameProject.GenderSelection.MALE -> R.id.gender_male_radio
             BabyNameProject.GenderSelection.FEMALE -> R.id.gender_female_radio
             BabyNameProject.GenderSelection.NEUTRAL -> R.id.gender_neutral_radio
         }
-        genderRadio.check(selection)
+        genderRadio.check(genderSelection)
+
+        val originsLogicSelection = when (project.originsLogic) {
+            BabyNameProject.OriginsLogic.AND -> R.id.origins_logic_and
+            BabyNameProject.OriginsLogic.OR -> R.id.origins_logic_or
+        }
+        originsLogicRadio.check(originsLogicSelection)
 
         // set pattern
         patternText.setText(project.pattern.toString())
@@ -138,6 +152,16 @@ class EditActivity : AppCompatActivity() {
             else -> {
                 Log.w(this, "Unhandled radio button id: ${genderRadio.checkedRadioButtonId}")
                 BabyNameProject.GenderSelection.ALL
+            }
+        }
+
+        // update origins logic
+        project.originsLogic = when (originsLogicRadio.checkedRadioButtonId) {
+            R.id.origins_logic_and -> BabyNameProject.OriginsLogic.AND
+            R.id.origins_logic_or -> BabyNameProject.OriginsLogic.OR
+            else -> {
+                Log.w(this, "Unhandled origins logic radio")
+                BabyNameProject.OriginsLogic.OR
             }
         }
 

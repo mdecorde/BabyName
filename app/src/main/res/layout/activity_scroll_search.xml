@@ -7,35 +7,72 @@
     android:layout_height="match_parent"
     tools:context=".ScrollSearchActivity">
 
+    <LinearLayout
+        android:id="@+id/header_layout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:layout_marginTop="5dp"
+        android:orientation="horizontal">
+
+        <ImageView
+            android:layout_width="0sp"
+            android:layout_height="match_parent"
+            android:layout_weight="0.1"
+            android:layout_gravity="center"
+            android:src="@drawable/filter" />
+
+        <EditText
+            android:layout_width="0sp"
+            android:layout_height="match_parent"
+            android:layout_gravity="center"
+            android:background="#D9D9D9"
+            android:inputType="textFilter"
+            android:layout_weight="0.6"
+            android:id="@+id/filter_text" />
+
+        <TextView
+            android:layout_width="0sp"
+            android:layout_height="match_parent"
+            android:text="1234"
+            android:gravity="center"
+            android:layout_weight="0.1"
+            android:id="@+id/counter_text" />
+
+    </LinearLayout>
+
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recyclerview"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_above="@+id/bottom_layout"
-        android:layout_marginBottom="-8dp"
+        android:layout_below="@+id/header_layout"
+        android:layout_above="@+id/footer_layout"
+        android:layout_marginBottom="8dp"
         tools:listitem="@layout/item_scroll" />
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:id="@+id/bottom_layout"
+        android:id="@+id/footer_layout"
         android:layout_alignParentBottom="true"
         android:orientation="horizontal">
 
         <Button
             android:layout_width="0sp"
             android:layout_height="wrap_content"
-            android:layout_margin="8dp"
+            android:layout_margin="5dp"
             android:layout_weight="0.5"
+            android:backgroundTint="@color/colorPrimary"
             android:id="@+id/dropButton"
-            android:text="Drop 20%"
+            android:text="@string/button_drop_20_percent"
             />
 
         <Button
             android:layout_width="0sp"
             android:layout_height="wrap_content"
-            android:layout_margin="8dp"
+            android:layout_margin="5dp"
             android:layout_weight="0.5"
+            android:backgroundTint="@color/colorPrimary"
             android:id="@+id/sortButton"
             android:text="@string/button_sort"
             />

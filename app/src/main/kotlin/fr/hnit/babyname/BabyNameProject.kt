@@ -20,10 +20,16 @@ class BabyNameProject() : Serializable {
     var iD: String = UUID.randomUUID().toString()
     var gender = GenderSelection.ALL
     var origins = HashSet<String>()
+    var originsLogic = OriginsLogic.OR
     var pattern: Pattern? = null
-    var scores = HashMap<Int, Int>()
+    var scores = HashMap<Int, Float>()
     var nexts = mutableListOf<Int>()
     var nextsIndex = 0
+
+    enum class OriginsLogic {
+        OR,
+        AND
+    }
 
     // gender selection
     enum class GenderSelection {
@@ -42,6 +48,7 @@ class BabyNameProject() : Serializable {
         val project = BabyNameProject()
         project.gender = gender
         project.origins = origins.toHashSet()
+        project.originsLogic = originsLogic
         project.pattern = pattern
         project.scores = HashMap(scores)
         project.nexts = nexts.toMutableList()
@@ -53,9 +60,14 @@ class BabyNameProject() : Serializable {
         needSaving = save
     }
 
+    // map float score to Integer
+    fun getIntScore(id: Int): Int {
+        return (2 * (scores[id] ?: 0F)).toInt()
+    }
+
     fun getBest(): BabyName? {
         var bestScoreIndex = -1
-        var bestScoreValue = 0
+        var bestScoreValue = 0f
 
         for (entry in scores.iterator()) {
             if (entry.value > bestScoreValue) {
@@ -71,6 +83,44 @@ class BabyNameProject() : Serializable {
         }
     }
 
+    // fix name ids when the database changes
+    fun updateIDs(map: HashMap<Int, Int>) {
+        val newNexts = ArrayList<Int>()
+        for (next in nexts) {
+            val newIndex = map.get(next)
+            if (newIndex != null) {
+                // invalidate
+                nextsIndex = 0
+
+                if (newIndex >= 0) {
+                    // new index
+                    newNexts.add(newIndex)
+                } else {
+                    // name deleted
+                }
+            } else {
+                // index not changes
+                newNexts.add(next)
+            }
+        }
+        nexts = newNexts
+
+        val newScores = hashMapOf<Int, Float>()
+        for ((id, score) in scores) {
+            val newIndex = map.get(id)
+            if (newIndex != null) {
+                if (newIndex >= 0) {
+                    // new index
+                    newScores[newIndex] = score
+                } else {
+                    // name deleted
+                }
+            }
+        }
+        scores = newScores
+    }
+
+    // check if a name matches
     fun isNameValid(name: BabyName?): Boolean {
         if (name == null) {
             return false
@@ -88,15 +138,26 @@ class BabyNameProject() : Serializable {
         }
 
         if (origins.isNotEmpty()) {
-            var originMatches = false
-            for (origin in name.origins) {
-                if (origins.contains(origin)) {
-                    originMatches = true
-                    continue
+            if (originsLogic == OriginsLogic.OR) {
+                var originMatches = false
+                for (origin in name.origins) {
+                    if (origin in origins) {
+                        originMatches = true
+                        continue
+                    }
+                }
+
+                if (!originMatches) {
+                    return false
                 }
             }
-            if (!originMatches) {
-                return false
+
+            if (originsLogic == OriginsLogic.AND) {
+                for (origin in origins) {
+                    if (origin !in name.origins) {
+                        return false
+                    }
+                }
             }
         }
 
@@ -124,7 +185,7 @@ class BabyNameProject() : Serializable {
 
     fun nextRound() {
         // sort by score, lowest scores last
-        nexts.sortWith { i1: Int, i2: Int -> (scores[i2] ?: 0) - (scores[i1] ?: 0 ) }
+        nexts.sortWith { i1: Int, i2: Int -> (2 * ((scores[i2] ?: 0F) - (scores[i1] ?: 0F))).toInt() }
 
         dropLast()
 
@@ -186,7 +247,7 @@ class BabyNameProject() : Serializable {
         val names = scores.keys.toMutableList()
 
         //Log.d("names before sort: "+names+" scores: "+scores);
-        names.sortWith { b1: Int, b2: Int -> (scores[b2] ?: 0) - (scores[b1] ?: 0) }
+        names.sortWith { b1: Int, b2: Int -> (2 * ((scores[b2] ?: 0f) - (scores[b1] ?: 0f))).toInt() }
 
         //Log.d("names after sort: "+names);
         val min = min(10, names.size)

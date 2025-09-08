@@ -12,7 +12,8 @@ import android.widget.RatingBar
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 
-class ScrollSearchAdapter(private val scrollActivity: ScrollSearchActivity, private val project: BabyNameProject)
+class ScrollSearchAdapter(private val scrollActivity: ScrollSearchActivity,
+        private val nexts: ArrayList<Int>, private val scores: HashMap<Int, Float>)
     : RecyclerView.Adapter<ScrollSearchAdapter.ViewHolder>() {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
@@ -23,12 +24,14 @@ class ScrollSearchAdapter(private val scrollActivity: ScrollSearchActivity, priv
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        val index = project.nexts[position]
+        //Log.d(this, "onBindViewHolder $position")
+
+        val index = nexts[position]
         val babyName = MainActivity.database.get(index)
 
         holder.rankView.text = "${position + 1}."
-        holder.textView.text = babyName.name
-        holder.rateBar.rating = (project.scores[index] ?: 0).toFloat() / 2.0F
+        holder.textView.text = scrollActivity.getHighlightedName(babyName.name)
+        holder.rateBar.rating = scores[index] ?: 0F
         holder.extraView.text = babyName.getMetaString(scrollActivity.applicationContext)
 
         holder.rateBar.onRatingBarChangeListener = RatingBar.OnRatingBarChangeListener {
@@ -40,7 +43,7 @@ class ScrollSearchAdapter(private val scrollActivity: ScrollSearchActivity, priv
     }
 
     override fun getItemCount(): Int {
-        return project.nexts.size
+        return nexts.size
     }
 
     class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {

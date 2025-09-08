@@ -3,16 +3,14 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="fill_parent"
     android:layout_height="wrap_content"
-    android:weightSum="1"
     >
         <TextView
             android:layout_width="0dp"
             android:layout_height="match_parent"
-            android:paddingEnd="3dp"
-            android:paddingRight="3dp"
             android:text="New Text"
             android:id="@+id/list_text"
             android:textAppearance="?android:attr/textAppearanceLarge"
+            android:padding="10dp"
             android:layout_weight="0.99"
             tools:ignore="RtlSymmetry" />
 
@@ -28,7 +26,6 @@
                 android:id="@+id/list_flip_find"
                 android:background="@null"
                 android:src="@drawable/flip_search"
-                android:layout_marginRight="5dp"
                 android:layout_marginEnd="5dp"
                 android:layout_marginBottom="5dp"
                 android:layout_row="0"
@@ -51,7 +48,6 @@
                 android:id="@+id/list_delete"
                 android:background="@null"
                 android:src="@drawable/delete"
-                android:layout_marginRight="5dp"
                 android:layout_marginEnd="5dp"
                 android:layout_row="1"
                 android:layout_column="0" />

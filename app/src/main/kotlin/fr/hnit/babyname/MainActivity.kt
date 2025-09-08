@@ -17,30 +17,48 @@ import android.view.MenuItem
 import android.view.View
 import android.widget.AdapterView.AdapterContextMenuInfo
 import android.widget.ListView
+import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.transition.Visibility
+import kotlin.concurrent.thread
 
 class MainActivity : AppCompatActivity() {
-    private lateinit var namesListView: ListView
+    private lateinit var projectListView: ListView
+    private lateinit var noBabyTextView: TextView
     private lateinit var adapter: ProjectListAdapter
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        if (database.size() == 0) {
-            database.initialize(applicationContext)
+        projectListView = findViewById(R.id.projectListView)
+        noBabyTextView = findViewById(R.id.noBabyTextView)
+        registerForContextMenu(projectListView)
+
+        if (!settings.isLoaded) {
+            settings.load(applicationContext)
         }
 
-        namesListView = findViewById(R.id.listView)
-        registerForContextMenu(namesListView)
+        if (database.size() == 0) {
+            thread(start = true) {
+                database.initialize(this)
+                runOnUiThread { finishActivityInitialization() }
+            }
+        } else {
+            finishActivityInitialization()
+        }
+    }
 
+    private fun finishActivityInitialization() {
         adapter = ProjectListAdapter(this, projects)
-        namesListView.adapter = adapter
+        projectListView.adapter = adapter
 
         if (projects.isEmpty()) {
             initializeProjects()
         }
+
+        adapter.notifyDataSetChanged()
     }
 
     private fun storeProjects() {
@@ -60,18 +78,31 @@ class MainActivity : AppCompatActivity() {
     }
 
     public override fun onResume() {
-       super.onResume()
-       adapter.notifyDataSetChanged()
+        super.onResume()
+        if (this::adapter.isInitialized) {
+            adapter.notifyDataSetChanged()
+        }
+        updateNoBabyMessage()
     }
 
     override fun onPause() {
-        super.onPause()
         storeProjects()
+        super.onPause()
     }
 
     override fun onDestroy() {
-        super.onDestroy()
         storeProjects()
+        super.onDestroy()
+    }
+
+    private fun updateNoBabyMessage() {
+        if (projects.isEmpty()) {
+            noBabyTextView.visibility = View.VISIBLE
+            projectListView.visibility = View.GONE
+        } else {
+            noBabyTextView.visibility = View.GONE
+            projectListView.visibility = View.VISIBLE
+        }
     }
 
     private fun initializeProjects() {
@@ -79,7 +110,7 @@ class MainActivity : AppCompatActivity() {
             if (filename.endsWith(".baby")) {
                 //Log.d("Loading $filename");
                 try {
-                    val project: BabyNameProject? = BabyNameProject.readProject(filename, this)
+                    val project = BabyNameProject.readProject(filename, this)
                     if (project != null) {
                         projects.add(project)
                     } else {
@@ -94,6 +125,8 @@ class MainActivity : AppCompatActivity() {
                 }
             }
         }
+
+        updateNoBabyMessage()
     }
 
     override fun onCreateContextMenu(menu: ContextMenu, v: View, menuInfo: ContextMenuInfo) {
@@ -193,7 +226,39 @@ class MainActivity : AppCompatActivity() {
         alert.show()
     }
 
-    fun projectToString(p: BabyNameProject): String {
+    override fun onCreateOptionsMenu(menu: Menu): Boolean {
+        Log.d(this, "onCreateOptionsMenu()")
+
+        val titles = listOf(R.string.menu_new_baby, R.string.menu_settings, R.string.menu_database, R.string.menu_about)
+        for (title in titles) {
+            menu.add(0, title, 0, title)
+        }
+
+        return true
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        Log.d(this, "onOptionsItemSelected() ${item.itemId}")
+
+        when (item.itemId) {
+            R.string.menu_new_baby -> {
+                doNewBaby()
+            }
+            R.string.menu_settings -> {
+                startActivity(Intent(applicationContext, SettingsActivity::class.java))
+            }
+            R.string.menu_database -> {
+                startActivity(Intent(applicationContext, DatabaseActivity::class.java))
+            }
+            R.string.menu_about -> {
+                startActivity(Intent(applicationContext, AboutActivity::class.java))
+            }
+        }
+
+        return super.onOptionsItemSelected(item)
+    }
+
+    fun projectToDescription(p: BabyNameProject): String {
         var text = when (p.gender) {
             BabyNameProject.GenderSelection.ALL -> getString(R.string.boy_or_girl_name)
             BabyNameProject.GenderSelection.MALE -> getString(R.string.boy_name)
@@ -208,32 +273,30 @@ class MainActivity : AppCompatActivity() {
 
         originsTranslated.sort()
 
-        text += " "
-        text += if (originsTranslated.size == 1) {
+        val separator = " " + when (p.originsLogic) {
+            BabyNameProject.OriginsLogic.AND -> getString(R.string.separator_and)
+            BabyNameProject.OriginsLogic.OR ->  getString(R.string.separator_or)
+        } + " "
+
+        text += " " + if (originsTranslated.size == 1) {
             String.format(getString(R.string.origin_is), originsTranslated[0])
         } else if (p.origins.size > 1) {
-            String.format(getString(R.string.origin_are), originsTranslated)
+            String.format(getString(R.string.origin_are), originsTranslated.joinToString(separator))
         } else {
             getString(R.string.no_origin)
         }
 
-        if (p.pattern != null) {
-            text += ", "
-            text += if (".*" == p.pattern.toString()) {
-                getString(R.string.no_pattern)
-            } else {
-                String.format(getString(R.string.matches_with), p.pattern)
-            }
-            text += " "
+        if (p.pattern != null && ".*" != p.pattern.toString()) {
+            text += " " + String.format(getString(R.string.matches_with), p.pattern)
         }
 
         //Log.d(this, "p.nexts.size: ${p.nexts.size}, p.scores.size: ${p.scores.size} p.nextsIndex: ${p.nextsIndex}, remainingNames: ${p.nexts.size - p.nextsIndex}")
 
         if (p.nexts.size == 1) {
-            text += getString(R.string.one_remaining_name)
+            text += " " + getString(R.string.one_remaining_name)
         } else {
             val remainingNames = p.nexts.size - p.nextsIndex
-            text += String.format(getString(R.string.remaining_names), remainingNames)
+            text += " " + String.format(getString(R.string.remaining_names), remainingNames)
         }
 
         val bestName = p.getBest()
@@ -245,14 +308,14 @@ class MainActivity : AppCompatActivity() {
     }
 
     fun doShowTop10(project: BabyNameProject) {
-        val names = project.getTop10()
+        val ids = project.getTop10()
 
         val buffer = StringBuffer()
-        for (name in names) {
-            buffer.append("${database[name]!!.name}: ${project.scores[name]}\n")
+        for (id in ids) {
+            buffer.append("${database.get(id).name}: ${project.scores[id]}\n")
         }
 
-        if (names.isEmpty()) {
+        if (ids.isEmpty()) {
             buffer.append(getString(R.string.no_name_rated))
         }
 
@@ -263,7 +326,7 @@ class MainActivity : AppCompatActivity() {
 
         builder.setPositiveButton(R.string.ok) { dialog, _ -> dialog.dismiss() }
 
-        if (names.isNotEmpty()) {
+        if (ids.isNotEmpty()) {
             builder.setNegativeButton(R.string.copy) { _, _ ->
                 val clipboard = getSystemService(CLIPBOARD_SERVICE) as ClipboardManager
                 val clip = ClipData.newPlainText("baby top10", buffer.toString())
@@ -281,13 +344,13 @@ class MainActivity : AppCompatActivity() {
     fun doFlipSearch(project: BabyNameProject) {
         val intent = Intent(this, FlipSearchActivity::class.java)
         intent.putExtra(PROJECT_EXTRA, projects.indexOf(project))
-        startActivityForResult(intent, 0)
+        startActivity(intent)
     }
 
     fun doScrollSearch(project: BabyNameProject) {
         val intent = Intent(this, ScrollSearchActivity::class.java)
         intent.putExtra(PROJECT_EXTRA, projects.indexOf(project))
-        startActivityForResult(intent, 0)
+        startActivity(intent)
     }
 
     fun doEditProject(project: BabyNameProject?) {
@@ -295,35 +358,7 @@ class MainActivity : AppCompatActivity() {
         if (project != null) {
             intent.putExtra(PROJECT_EXTRA, projects.indexOf(project))
         }
-        startActivityForResult(intent, 0)
-    }
-
-    override fun onCreateOptionsMenu(menu: Menu): Boolean {
-        menuInflater.inflate(R.menu.main, menu)
-        return true
-    }
-
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        return when (item.itemId) {
-            R.id.action_settings -> {
-                val intent = Intent(this@MainActivity, SettingsActivity::class.java)
-                this.startActivityForResult(intent, 0)
-                true
-            }
-
-            R.id.action_about -> {
-                val intent = Intent(this@MainActivity, AboutActivity::class.java)
-                this.startActivityForResult(intent, 0)
-                true
-            }
-
-            R.id.action_new_baby -> {
-                doNewBaby()
-                true
-            }
-
-            else -> super.onOptionsItemSelected(item)
-        }
+        startActivity(intent)
     }
 
     private fun doNewBaby() {
@@ -333,7 +368,8 @@ class MainActivity : AppCompatActivity() {
 
     companion object {
         const val PROJECT_EXTRA: String = "project_position"
-        var database = BabyNameDatabase()
-        var projects = ArrayList<BabyNameProject>()
+        val settings = BabyNameSettings()
+        val database = BabyNameDatabase()
+        val projects = ArrayList<BabyNameProject>()
     }
 }

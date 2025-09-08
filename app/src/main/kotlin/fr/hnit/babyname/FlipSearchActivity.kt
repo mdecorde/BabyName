@@ -10,7 +10,6 @@ import android.graphics.Color
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
-import android.preference.PreferenceManager
 import android.widget.Button
 import android.widget.ImageView
 import android.widget.LinearLayout
@@ -35,14 +34,10 @@ open class FlipSearchActivity : AppCompatActivity() {
     private lateinit var progressCounterText: TextView
     private lateinit var progressPercentText: TextView
     private lateinit var buttonLayout: LinearLayout
-    private var goToNext: Boolean = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_flip_search)
-
-        val sharedPref = PreferenceManager.getDefaultSharedPreferences(this@FlipSearchActivity)
-        goToNext = sharedPref.getBoolean("pref_next_ontouch", false)
 
         backgroundImage = findViewById(R.id.imageView)
         if (Math.random() > 0.5) {
@@ -82,22 +77,21 @@ open class FlipSearchActivity : AppCompatActivity() {
                 ratingBar: RatingBar, rating: Float, fromUser: Boolean ->
             val babyName = currentBabyName
             if (fromUser && babyName != null) {
-                val score = (rating * 2.0F).toInt()
-                project.scores[babyName.id] = score
+                project.scores[babyName.id] = rating
 
                 Toast.makeText(
                     this,
                     String.format(
                         getString(R.string.name_rated_score),
                         babyName.name,
-                        score
+                        rating
                     ),
                     Toast.LENGTH_SHORT
                 ).show()
 
                 project.setNeedToBeSaved(true)
 
-                if (goToNext) {
+                if (MainActivity.settings.nextOnRating) {
                     Handler(Looper.getMainLooper()).postDelayed({
                         if (babyName == currentBabyName) {
                             nextName()
