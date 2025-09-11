@@ -9,14 +9,17 @@
             android:layout_height="match_parent"
             android:text="New Text"
             android:id="@+id/list_text"
+            android:gravity="center_vertical"
+            android:paddingHorizontal="5dp"
             android:textAppearance="?android:attr/textAppearanceLarge"
-            android:padding="10dp"
+            android:layout_marginHorizontal="10dp"
             android:layout_weight="0.99"
             tools:ignore="RtlSymmetry" />
 
         <GridLayout
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
+            android:layout_margin="10dp"
             android:columnCount="2"
             android:rowCount="3">
 
