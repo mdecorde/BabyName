@@ -1,4 +1,6 @@
-* fix potential crash when starting app
-* allow search in flip search
-* allow add/or operation for origins
- 
+* use androidx packages for modern codebase
+* minimum Android 5.0 required now
+* add support for or/and operation on origins
+* add support for database export/import
+* fix support possible crash on startup on slow devices
+* add suport for live name search in scroll view
