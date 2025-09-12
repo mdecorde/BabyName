@@ -56,8 +56,8 @@
     <string name="no">No</string>
     <string name="no_baby">No Baby!\nUse the menu to create a new name project.</string>
     <string name="no_name_rated">No name rated yet. Start by pressing any search button.</string>
-    <string name="no_origin">Has no specific origin.</string>
-    <string name="no_pattern">Has no specific pattern.</string>
+    <string name="no_origin">has no specific origin.</string>
+    <string name="no_pattern">has no specific pattern.</string>
     <string name="no_remaining_loop" formatted="false">No remaining names to review (loop=%d). Start a new review loop with %d names?</string>
     <string name="ok">OK</string>
     <string name="one_remaining_name">One remaining name to review.</string>
