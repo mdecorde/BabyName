@@ -34,6 +34,7 @@ open class FlipSearchActivity : AppCompatActivity() {
     private lateinit var progressCounterText: TextView
     private lateinit var progressPercentText: TextView
     private lateinit var buttonLayout: LinearLayout
+    private lateinit var builder: AlertDialog.Builder
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -59,6 +60,8 @@ open class FlipSearchActivity : AppCompatActivity() {
         nextButton.setOnClickListener { nextName() }
         removeButton.setOnClickListener { removeName() }
         previousButton.setOnClickListener { previousName() }
+
+        builder = AlertDialog.Builder(this, R.style.AlertDialogTheme)
 
         val index = intent.getIntExtra(MainActivity.PROJECT_EXTRA, 0)
         if (index >= 0 && MainActivity.projects.size > index) {
@@ -106,7 +109,6 @@ open class FlipSearchActivity : AppCompatActivity() {
         val babyName = currentBabyName
         if (babyName == null) {
             // last or first name reached
-            val builder = AlertDialog.Builder(this)
             builder.setTitle(R.string.finish_round_title)
             builder.setMessage(String.format(getString(R.string.finish_round_message), BabyNameProject.DROP_RATE_PERCENT))
             builder.setPositiveButton(R.string.yes) { dialog: DialogInterface, id: Int ->

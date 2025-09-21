@@ -5,7 +5,6 @@
 
 package fr.hnit.babyname
 
-import android.app.AlertDialog
 import android.content.ClipData
 import android.content.ClipboardManager
 import android.content.Intent
@@ -19,14 +18,15 @@ import android.widget.AdapterView.AdapterContextMenuInfo
 import android.widget.ListView
 import android.widget.TextView
 import android.widget.Toast
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
-import androidx.transition.Visibility
 import kotlin.concurrent.thread
 
 class MainActivity : AppCompatActivity() {
     private lateinit var projectListView: ListView
     private lateinit var noBabyTextView: TextView
     private lateinit var adapter: ProjectListAdapter
+    private lateinit var builder: AlertDialog.Builder
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -39,6 +39,8 @@ class MainActivity : AppCompatActivity() {
 
         adapter = ProjectListAdapter(this, projects)
         projectListView.adapter = adapter
+
+        builder = AlertDialog.Builder(this, R.style.AlertDialogTheme)
 
         if (!database.isLoaded || !settings.isLoaded || !projects_isLoaded) {
             thread(start = true) {
@@ -183,8 +185,6 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun doResetScores(project: BabyNameProject) {
-        val builder = AlertDialog.Builder(this)
-
         builder.setTitle(R.string.reset_question_title)
         builder.setMessage(R.string.reset_question_content)
 
@@ -218,8 +218,6 @@ class MainActivity : AppCompatActivity() {
     }
 
     fun doDeleteProject(project: BabyNameProject) {
-        val builder = AlertDialog.Builder(this)
-
         builder.setTitle(R.string.delete_question_title)
         builder.setMessage(R.string.delete_question_content)
 
@@ -330,8 +328,6 @@ class MainActivity : AppCompatActivity() {
         if (ids.isEmpty()) {
             buffer.append(getString(R.string.no_name_rated))
         }
-
-        val builder = AlertDialog.Builder(this)
 
         builder.setTitle(R.string.top_title)
         builder.setMessage(buffer.toString())

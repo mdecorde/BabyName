@@ -30,6 +30,7 @@ class ScrollSearchActivity : AppCompatActivity() {
     private lateinit var counterTextView: TextView
     private lateinit var dropButton: Button
     private lateinit var sortButton: Button
+    private lateinit var builder: AlertDialog.Builder
     private var nexts = ArrayList<Int>()
     private var scores = HashMap<Int, Float>()
     private var needSaving = false
@@ -44,6 +45,8 @@ class ScrollSearchActivity : AppCompatActivity() {
         dropButton = findViewById(R.id.dropButton)
         sortButton = findViewById(R.id.sortButton)
         recyclerView = findViewById(R.id.recyclerview)
+
+        builder = AlertDialog.Builder(this, R.style.AlertDialogTheme)
 
         recyclerView.layoutManager = LinearLayoutManager(this)
 
@@ -134,8 +137,6 @@ class ScrollSearchActivity : AppCompatActivity() {
 
     private fun dropDialog() {
         val amountToRemove = ((BabyNameProject.DROP_RATE_PERCENT * nexts.size) / 100)
-
-        val builder = AlertDialog.Builder(this)
 
         builder.setTitle(R.string.dialog_drop_title)
         builder.setMessage(String.format(getString(R.string.dialog_drop_message), amountToRemove, nexts.size))
