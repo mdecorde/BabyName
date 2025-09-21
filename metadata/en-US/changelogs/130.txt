@@ -2,5 +2,5 @@
 * minimum Android 5.0 required now
 * add support for or/and operation on origins
 * add support for database export/import
-* fix support possible crash on startup on slow devices
-* add suport for live name search in scroll view
+* fix possible crash on startup on slow devices
+* add support for live name search in scroll view
