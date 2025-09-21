@@ -11,6 +11,7 @@ import java.io.IOException
 import java.io.InputStreamReader
 
 class BabyNameDatabase {
+    public var isLoaded = false
     private var allNames = arrayListOf<BabyName>()
 
     fun initialize(activity: Activity) {
@@ -69,6 +70,7 @@ class BabyNameDatabase {
 
         // set new names as last step
         allNames = newNames
+        isLoaded = true
     }
 
     private fun getExcerpt(str: String, max: Int = 32): String {

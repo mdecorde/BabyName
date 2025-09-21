@@ -34,31 +34,34 @@ class MainActivity : AppCompatActivity() {
 
         projectListView = findViewById(R.id.projectListView)
         noBabyTextView = findViewById(R.id.noBabyTextView)
+
         registerForContextMenu(projectListView)
 
-        if (!settings.isLoaded) {
-            settings.load(applicationContext)
-        }
-
-        if (database.size() == 0) {
-            thread(start = true) {
-                database.initialize(this)
-                runOnUiThread { finishActivityInitialization() }
-            }
-        } else {
-            finishActivityInitialization()
-        }
-    }
-
-    private fun finishActivityInitialization() {
         adapter = ProjectListAdapter(this, projects)
         projectListView.adapter = adapter
 
-        if (projects.isEmpty()) {
-            initializeProjects()
+        if (!database.isLoaded || !settings.isLoaded || !projects_isLoaded) {
+            thread(start = true) {
+                if (!settings.isLoaded) {
+                    settings.load(applicationContext)
+                }
+
+                if (!database.isLoaded) {
+                    database.initialize(this)
+                }
+
+                if (!projects_isLoaded) {
+                    initializeProjects()
+                }
+
+                runOnUiThread {
+                    adapter.notifyDataSetChanged()
+                    updateNoBabyMessage()
+                }
+            }
         }
 
-        adapter.notifyDataSetChanged()
+        updateNoBabyMessage()
     }
 
     private fun storeProjects() {
@@ -82,6 +85,7 @@ class MainActivity : AppCompatActivity() {
         if (this::adapter.isInitialized) {
             adapter.notifyDataSetChanged()
         }
+
         updateNoBabyMessage()
     }
 
@@ -96,29 +100,37 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun updateNoBabyMessage() {
-        if (projects.isEmpty()) {
-            noBabyTextView.visibility = View.VISIBLE
-            projectListView.visibility = View.GONE
+
+        if (projects_isLoaded) {
+            if (projects.isEmpty()) {
+                noBabyTextView.visibility = View.VISIBLE
+                projectListView.visibility = View.GONE
+            } else {
+                noBabyTextView.visibility = View.GONE
+                projectListView.visibility = View.VISIBLE
+            }
         } else {
             noBabyTextView.visibility = View.GONE
-            projectListView.visibility = View.VISIBLE
+            projectListView.visibility = View.GONE
         }
     }
 
     private fun initializeProjects() {
         for (filename in this.fileList()) {
             if (filename.endsWith(".baby")) {
-                //Log.d("Loading $filename");
+                //Log.d(this, "Loading $filename")
                 try {
                     val project = BabyNameProject.readProject(filename, this)
                     if (project != null) {
                         projects.add(project)
                     } else {
-                        Toast.makeText(
-                            this@MainActivity,
-                            "Error: could not read baby name project from $filename",
-                            Toast.LENGTH_LONG
-                        ).show()
+                        runOnUiThread {
+                            Toast.makeText(
+                                this@MainActivity,
+                                "Error: could not read baby name project from $filename",
+                                Toast.LENGTH_LONG
+                            ).show()
+                        }
                     }
                 } catch (e: Exception) {
                     e.printStackTrace()
@@ -126,7 +138,7 @@ class MainActivity : AppCompatActivity() {
             }
         }
 
-        updateNoBabyMessage()
+        projects_isLoaded = true
     }
 
     override fun onCreateContextMenu(menu: ContextMenu, v: View, menuInfo: ContextMenuInfo) {
@@ -367,9 +379,10 @@ class MainActivity : AppCompatActivity() {
     }
 
     companion object {
-        const val PROJECT_EXTRA: String = "project_position"
+        const val PROJECT_EXTRA = "project_position"
         val settings = BabyNameSettings()
         val database = BabyNameDatabase()
         val projects = ArrayList<BabyNameProject>()
+        var projects_isLoaded = false
     }
 }
