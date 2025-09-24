@@ -219,8 +219,8 @@ class ScrollSearchActivity : AppCompatActivity() {
             if (aMatchLength != bMatchLength) {
                 return@sortWith (bMatchLength - aMatchLength)
             } else {
-                val aScore = project.getIntScore(a.id)
-                val bScore = project.getIntScore(b.id)
+                val aScore = ((scores.get(a.id) ?: 0f) * 2f).toInt()
+                val bScore = ((scores.get(b.id) ?: 0f) * 2f).toInt()
 
                 if (aScore != bScore) {
                     return@sortWith (bScore - aScore)
