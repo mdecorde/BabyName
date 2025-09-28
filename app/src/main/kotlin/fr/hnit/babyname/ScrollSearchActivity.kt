@@ -112,6 +112,8 @@ class ScrollSearchActivity : AppCompatActivity() {
                     val nameId = nexts.removeAt(position)
                     val scoreBackup = scores.remove(nameId)
 
+                    updateCounter()
+
                     val needSavingBackup =  needSaving
                     needSaving = true
 
@@ -128,6 +130,7 @@ class ScrollSearchActivity : AppCompatActivity() {
                         if (scoreBackup != null) {
                             scores[nameId] = scoreBackup
                         }
+                        updateCounter()
                         recyclerView.scrollToPosition(position)
                         scrollAdapter.notifyItemInserted(position)
                     }
@@ -257,6 +260,13 @@ class ScrollSearchActivity : AppCompatActivity() {
             }
         }
 
+        updateCounter()
+
+        scrollAdapter.notifyDataSetChanged()
+        recyclerView.scrollToPosition(0)
+    }
+
+    private fun updateCounter() {
         counterTextView.text = if (sortPattern.isEmpty()) {
             nexts.size.toString()
         } else {
@@ -269,9 +279,6 @@ class ScrollSearchActivity : AppCompatActivity() {
             }
             counter.toString()
         }
-
-        scrollAdapter.notifyDataSetChanged()
-        recyclerView.scrollToPosition(0)
     }
 
     public override fun onStop() {
