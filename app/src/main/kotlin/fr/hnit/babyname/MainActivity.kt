@@ -22,7 +22,11 @@ import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import kotlin.concurrent.thread
 
-class MainActivity : AppCompatActivity() {
+interface UpdateViewListener {
+    fun updateView()
+}
+
+class MainActivity : UpdateViewListener, AppCompatActivity() {
     private lateinit var projectListView: ListView
     private lateinit var noBabyTextView: TextView
     private lateinit var adapter: ProjectListAdapter
@@ -64,6 +68,8 @@ class MainActivity : AppCompatActivity() {
         }
 
         updateNoBabyMessage()
+
+        instance = this
     }
 
     private fun storeProjects() {
@@ -82,13 +88,17 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    public override fun onResume() {
-        super.onResume()
+    override fun updateView() {
         if (this::adapter.isInitialized) {
             adapter.notifyDataSetChanged()
         }
 
         updateNoBabyMessage()
+    }
+
+    override fun onResume() {
+        updateView()
+        super.onResume()
     }
 
     override fun onPause() {
@@ -190,7 +200,7 @@ class MainActivity : AppCompatActivity() {
 
         builder.setPositiveButton(R.string.yes) { dialog, _ ->
             project.scores.clear()
-            project.setNeedToBeSaved(true)
+            project.needSaving = true
             adapter.notifyDataSetChanged()
             if (!BabyNameProject.storeProject(project, this@MainActivity)) {
                 Toast.makeText(
@@ -212,7 +222,7 @@ class MainActivity : AppCompatActivity() {
 
     private fun doCloneProject(project: BabyNameProject) {
         val cloned = project.cloneProject()
-        cloned.setNeedToBeSaved(true)
+        cloned.needSaving = true
         projects.add(cloned)
         adapter.notifyDataSetChanged()
     }
@@ -374,11 +384,17 @@ class MainActivity : AppCompatActivity() {
         doEditProject(null)
     }
 
+    override fun onStop() {
+        instance = null
+        super.onStop()
+    }
+
     companion object {
         const val PROJECT_EXTRA = "project_position"
         val settings = BabyNameSettings()
         val database = BabyNameDatabase()
         val projects = ArrayList<BabyNameProject>()
         var projects_isLoaded = false
+        var instance: UpdateViewListener? = null
     }
 }

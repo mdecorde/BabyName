@@ -19,10 +19,16 @@ import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import com.google.android.material.snackbar.Snackbar
+import fr.hnit.babyname.BabyNameProject.Companion.DROP_RATE_PERCENT
 
 open class FlipSearchActivity : AppCompatActivity() {
     private lateinit var project: BabyNameProject
     private var currentBabyName: BabyName? = null
+
+    private var nexts = ArrayList<Int>()
+    private var scores = HashMap<Int, Float>()
+    private var nextsIndex = 0
+    private var needSaving = false
 
     private lateinit var backgroundImage: ImageView
     private lateinit var nextButton: Button
@@ -66,8 +72,15 @@ open class FlipSearchActivity : AppCompatActivity() {
         val index = intent.getIntExtra(MainActivity.PROJECT_EXTRA, 0)
         if (index >= 0 && MainActivity.projects.size > index) {
             project = MainActivity.projects[index]
-            currentBabyName = project.currentName()
         }
+
+        // create a copy
+        nexts = ArrayList(project.nexts)
+        scores = HashMap(project.scores)
+        nextsIndex = project.nextsIndex
+        needSaving = project.needSaving
+
+        currentBabyName = getCurrentName()
 
         if (currentBabyName == null) {
             Toast.makeText(this@FlipSearchActivity, R.string.message_no_name_to_review, Toast.LENGTH_LONG).show()
@@ -80,7 +93,7 @@ open class FlipSearchActivity : AppCompatActivity() {
                 ratingBar: RatingBar, rating: Float, fromUser: Boolean ->
             val babyName = currentBabyName
             if (fromUser && babyName != null) {
-                project.scores[babyName.id] = rating
+                scores[babyName.id] = rating
 
                 Toast.makeText(
                     this,
@@ -92,7 +105,7 @@ open class FlipSearchActivity : AppCompatActivity() {
                     Toast.LENGTH_SHORT
                 ).show()
 
-                project.setNeedToBeSaved(true)
+                needSaving = true
 
                 if (MainActivity.settings.nextOnRating) {
                     Handler(Looper.getMainLooper()).postDelayed({
@@ -110,9 +123,9 @@ open class FlipSearchActivity : AppCompatActivity() {
         if (babyName == null) {
             // last or first name reached
             builder.setTitle(R.string.finish_round_title)
-            builder.setMessage(String.format(getString(R.string.finish_round_message), BabyNameProject.DROP_RATE_PERCENT))
+            builder.setMessage(String.format(getString(R.string.finish_round_message), DROP_RATE_PERCENT))
             builder.setPositiveButton(R.string.yes) { dialog: DialogInterface, id: Int ->
-                project.nextRound()
+                nextRound()
                 dialog.dismiss()
                 finish()
             }
@@ -125,28 +138,27 @@ open class FlipSearchActivity : AppCompatActivity() {
 
             extraText.text = babyName.getMetaString(applicationContext)
 
-            progressCounterText.text = String.format("(%d/%d)", project.nextsIndex + 1, project.nexts.size)
-            progressPercentText.text = String.format("%d%%", (100 * project.nextsIndex) / project.nexts.size)
+            progressCounterText.text = String.format("(%d/%d)", nextsIndex + 1, nexts.size)
+            progressPercentText.text = String.format("%d%%", (100 * nextsIndex) / nexts.size)
 
             // set existing score or default to 0
-            rateBar.rating = (project.scores[babyName.id] ?: 0).toFloat() / 2.0F
+            rateBar.rating = (scores[babyName.id] ?: 0).toFloat() / 2.0F
         }
     }
 
     private fun nextName() {
-        currentBabyName = project.nextName()
+        currentBabyName = getNextName()
         updateName()
     }
 
     private fun removeName() {
-        val position = project.nextsIndex
-        val nameId = project.nexts.removeAt(position)
-        val scoreBackup = project.scores.remove(nameId)
+        val position = nextsIndex
+        val nameId = nexts.removeAt(position)
+        val scoreBackup = scores.remove(nameId)
+        val needSavingBackup = needSaving
+        needSaving = true
 
-        val needSavingBackup =  project.needSaving
-        project.needSaving = true
-
-        currentBabyName = project.currentName()
+        currentBabyName = getCurrentName()
         updateName()
 
         val snackbar = Snackbar.make(
@@ -155,13 +167,13 @@ open class FlipSearchActivity : AppCompatActivity() {
             Snackbar.LENGTH_LONG
         )
         snackbar.setAction(R.string.undo) {
-            project.nexts.add(position, nameId)
-            project.needSaving = needSavingBackup
+            nexts.add(position, nameId)
+            needSaving = needSavingBackup
             if (scoreBackup != null) {
-                project.scores[nameId] = scoreBackup
+                scores[nameId] = scoreBackup
             }
 
-            currentBabyName = project.currentName()
+            currentBabyName = getCurrentName()
             updateName()
         }
 
@@ -169,13 +181,73 @@ open class FlipSearchActivity : AppCompatActivity() {
         snackbar.show()
     }
 
+    private fun getCurrentName(): BabyName? {
+        if (nextsIndex >= 0 && nextsIndex < nexts.size) {
+            return MainActivity.database.get(nexts[nextsIndex])
+        } else {
+            return null
+        }
+    }
+
+    private fun getPreviousName(): BabyName? {
+        if (nextsIndex > 0 && nextsIndex <= nexts.size) {
+            nextsIndex -= 1
+            return MainActivity.database.get(nexts[nextsIndex])
+        } else {
+            return null
+        }
+    }
+
+    private fun getNextName(): BabyName? {
+        if (nextsIndex >= -1 && (nextsIndex + 1) < nexts.size) {
+            needSaving = true
+            nextsIndex += 1
+            return MainActivity.database.get(nexts[nextsIndex])
+        } else {
+            return null
+        }
+    }
+
+    private fun nextRound() {
+        // sort by score, lowest scores last
+        nexts.sortWith { i1: Int, i2: Int -> (2 * ((scores[i2] ?: 0F) - (scores[i1] ?: 0F))).toInt() }
+
+        dropLast()
+
+        nexts.shuffle()
+
+        nextsIndex = 0
+
+        needSaving = true
+    }
+
+    private fun dropLast() {
+        if (nexts.size > 10) {
+            val amountToRemove = ((DROP_RATE_PERCENT *  nexts.size) / 100)
+
+            // keep scores updated
+            for (idx in nexts.takeLast(amountToRemove)) {
+                scores.remove(idx)
+            }
+
+            nexts = ArrayList(nexts.dropLast(amountToRemove))
+            needSaving = true
+        }
+    }
+
     private fun previousName() {
-        currentBabyName = project.previousName()
+        currentBabyName = getPreviousName()
         updateName()
     }
 
     public override fun onStop() {
+        project.nexts = nexts
+        project.scores = scores
+        project.nextsIndex = nextsIndex
+        project.needSaving = needSaving
+
+        MainActivity.instance?.updateView()
+
         super.onStop()
-        project.setNeedToBeSaved(true)
     }
 }

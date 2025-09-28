@@ -21,6 +21,7 @@ import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.snackbar.Snackbar
+import fr.hnit.babyname.BabyNameProject.Companion.DROP_RATE_PERCENT
 
 class ScrollSearchActivity : AppCompatActivity() {
     private lateinit var project: BabyNameProject
@@ -31,9 +32,11 @@ class ScrollSearchActivity : AppCompatActivity() {
     private lateinit var dropButton: Button
     private lateinit var sortButton: Button
     private lateinit var builder: AlertDialog.Builder
+
     private var nexts = ArrayList<Int>()
     private var scores = HashMap<Int, Float>()
     private var needSaving = false
+
     private var sortPattern = emptyList<String>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -61,6 +64,7 @@ class ScrollSearchActivity : AppCompatActivity() {
         // create a copy
         nexts = ArrayList(project.nexts)
         scores = HashMap(project.scores)
+        needSaving = project.needSaving
 
         scrollAdapter = ScrollSearchAdapter(this, nexts, scores)
 
@@ -135,6 +139,20 @@ class ScrollSearchActivity : AppCompatActivity() {
         }).attachToRecyclerView(recyclerView)
     }
 
+    private fun dropLast() {
+        if (nexts.size > 10) {
+            val amountToRemove = ((DROP_RATE_PERCENT *  nexts.size) / 100)
+
+            // keep scores updated
+            for (idx in nexts.takeLast(amountToRemove)) {
+                scores.remove(idx)
+            }
+
+            nexts = ArrayList(nexts.dropLast(amountToRemove))
+            needSaving = true
+        }
+    }
+
     private fun dropDialog() {
         val amountToRemove = ((BabyNameProject.DROP_RATE_PERCENT * nexts.size) / 100)
 
@@ -142,7 +160,7 @@ class ScrollSearchActivity : AppCompatActivity() {
         builder.setMessage(String.format(getString(R.string.dialog_drop_message), amountToRemove, nexts.size))
 
         builder.setPositiveButton(R.string.yes) { dialog, _ ->
-            project.dropLast()
+            dropLast()
             dialog.dismiss()
         }
 
@@ -257,10 +275,13 @@ class ScrollSearchActivity : AppCompatActivity() {
     }
 
     public override fun onStop() {
-        super.onStop()
         project.nexts = nexts
         project.scores = scores
-        project.setNeedToBeSaved(needSaving)
+        project.needSaving = needSaving
+
+        MainActivity.instance?.updateView()
+
+        super.onStop()
     }
 
     fun getHighlightedName(name: String): SpannableString {

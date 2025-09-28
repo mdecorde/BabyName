@@ -56,10 +56,6 @@ class BabyNameProject() : Serializable {
         return project
     }
 
-    fun setNeedToBeSaved(save: Boolean) {
-        needSaving = save
-    }
-
     // map float score to Integer
     fun getIntScore(id: Int): Int {
         return (2 * (scores[id] ?: 0F)).toInt()
@@ -167,62 +163,6 @@ class BabyNameProject() : Serializable {
         return true
     }
 
-    fun dropLast() {
-        if (nexts.size > 10) {
-            val amountToRemove = ((DROP_RATE_PERCENT *  nexts.size) / 100)
-
-            val removed = nexts.subList(nexts.size - amountToRemove, nexts.size)
-
-            // keep scores updated
-            for (i in removed) {
-                scores.remove(i)
-            }
-
-            nexts = nexts.subList(0, nexts.size - amountToRemove)
-            setNeedToBeSaved(true)
-        }
-    }
-
-    fun nextRound() {
-        // sort by score, lowest scores last
-        nexts.sortWith { i1: Int, i2: Int -> (2 * ((scores[i2] ?: 0F) - (scores[i1] ?: 0F))).toInt() }
-
-        dropLast()
-
-        nexts.shuffle()
-
-        nextsIndex = 0
-
-        setNeedToBeSaved(true)
-    }
-
-    fun currentName(): BabyName? {
-        if (nextsIndex >= 0 && nextsIndex < nexts.size) {
-            return MainActivity.database.get(nexts[nextsIndex])
-        } else {
-            return null
-        }
-    }
-
-    fun previousName(): BabyName? {
-        if (nextsIndex > 0 && nextsIndex <= nexts.size) {
-            nextsIndex -= 1
-            return MainActivity.database.get(nexts[nextsIndex])
-        } else {
-            return null
-        }
-    }
-
-    fun nextName(): BabyName? {
-        if (nextsIndex >= -1 && (nextsIndex + 1) < nexts.size) {
-            setNeedToBeSaved(true)
-            nextsIndex += 1
-            return MainActivity.database.get(nexts[nextsIndex])
-        } else {
-            return null
-        }
-    }
-
     fun rebuildNexts() {
         nexts.clear()
         for (i in 0 until MainActivity.database.size()) {
@@ -240,7 +180,7 @@ class BabyNameProject() : Serializable {
 
         rebuildNexts()
 
-        setNeedToBeSaved(true)
+        needSaving = true
     }
 
     fun getTop10(): List<Int> {
@@ -288,7 +228,7 @@ class BabyNameProject() : Serializable {
                 serializer.writeObject(project)
                 fos.close()
 
-                project.setNeedToBeSaved(false)
+                project.needSaving = false
             } catch (e: Exception) {
                 Log.e(this, "Cannot open $fileName")
                 e.printStackTrace()

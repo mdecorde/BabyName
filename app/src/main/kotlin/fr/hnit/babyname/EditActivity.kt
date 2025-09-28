@@ -178,7 +178,7 @@ class EditActivity : AppCompatActivity() {
         }
 
         project.rebuildNexts()
-        project.setNeedToBeSaved(true)
+        project.needSaving = true
 
         return true
     }
