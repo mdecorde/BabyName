@@ -1,1 +1,3 @@
 * fix sorting by score in scroll view
+* fix update of main project overview data
+* fix counter update in scroll view when a name is removed
