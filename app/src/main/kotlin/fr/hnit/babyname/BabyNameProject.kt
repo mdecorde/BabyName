@@ -23,7 +23,7 @@ class BabyNameProject() : Serializable {
     var originsLogic = OriginsLogic.OR
     var pattern: Pattern? = null
     var scores = HashMap<Int, Float>()
-    var nexts = mutableListOf<Int>()
+    var nexts = listOf<Int>()
     var nextsIndex = 0
 
     enum class OriginsLogic {
@@ -164,14 +164,15 @@ class BabyNameProject() : Serializable {
     }
 
     fun rebuildNexts() {
-        nexts.clear()
+        val newNexts = mutableListOf<Int>()
         for (i in 0 until MainActivity.database.size()) {
             if (isNameValid(MainActivity.database.get(i))) {
-                nexts.add(i)
+                newNexts.add(i)
             }
         }
-        nexts.shuffle()
+        newNexts.shuffle()
 
+        nexts = newNexts
         nextsIndex = 0
     }
 
