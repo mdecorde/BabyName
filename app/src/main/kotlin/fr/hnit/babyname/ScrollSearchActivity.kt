@@ -282,7 +282,8 @@ class ScrollSearchActivity : AppCompatActivity() {
     }
 
     public override fun onStop() {
-        project.nexts = nexts
+        val nextsSet = HashSet(nexts)
+        project.nexts = project.nexts.filter { nextsSet.contains(it) }
         project.scores = scores
         project.needSaving = needSaving
 
