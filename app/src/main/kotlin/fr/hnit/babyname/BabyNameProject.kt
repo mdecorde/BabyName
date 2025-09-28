@@ -56,11 +56,6 @@ class BabyNameProject() : Serializable {
         return project
     }
 
-    // map float score to Integer
-    fun getIntScore(id: Int): Int {
-        return (2 * (scores[id] ?: 0F)).toInt()
-    }
-
     fun getBest(): BabyName? {
         var bestScoreIndex = -1
         var bestScoreValue = 0f

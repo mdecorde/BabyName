@@ -202,7 +202,7 @@ class ScrollSearchActivity : AppCompatActivity() {
             val source = MainActivity.database.get(id)
             for (targetOrigin in target.origins) {
                 if (targetOrigin in source.origins) {
-                    score += project.getIntScore(id)
+                    score += ((scores.get(id) ?: 0f) * 2f).toInt()
                 }
             }
 
@@ -219,7 +219,7 @@ class ScrollSearchActivity : AppCompatActivity() {
         for (id in scores.keys) {
             val source = MainActivity.database.get(id)
             if (target.soundex == source.soundex) {
-                val score = project.getIntScore(id)
+                val score = ((scores.get(id) ?: 0f) * 2f).toInt()
                 if (score > maxScore) {
                     maxScore = score
                 }
