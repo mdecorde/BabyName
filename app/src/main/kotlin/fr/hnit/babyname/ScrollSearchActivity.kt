@@ -153,6 +153,8 @@ class ScrollSearchActivity : AppCompatActivity() {
 
             nexts = ArrayList(nexts.dropLast(amountToRemove))
             needSaving = true
+
+            updateCounter()
         }
     }
 
