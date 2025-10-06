@@ -10,10 +10,13 @@ import android.os.Bundle
 import android.text.SpannableString
 import android.text.Spanned
 import android.text.style.BackgroundColorSpan
+import android.view.Menu
+import android.view.MenuItem
 import android.view.View
 import android.widget.Button
 import android.widget.EditText
 import android.widget.TextView
+import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.widget.doOnTextChanged
@@ -29,7 +32,6 @@ class ScrollSearchActivity : AppCompatActivity() {
     private lateinit var scrollAdapter: ScrollSearchAdapter
     private lateinit var sortPatternTextView: EditText
     private lateinit var counterTextView: TextView
-    private lateinit var dropButton: Button
     private lateinit var sortButton: Button
     private lateinit var builder: AlertDialog.Builder
 
@@ -45,7 +47,6 @@ class ScrollSearchActivity : AppCompatActivity() {
 
         sortPatternTextView = findViewById(R.id.filter_text)
         counterTextView = findViewById(R.id.counter_text)
-        dropButton = findViewById(R.id.dropButton)
         sortButton = findViewById(R.id.sortButton)
         recyclerView = findViewById(R.id.recyclerview)
 
@@ -61,6 +62,12 @@ class ScrollSearchActivity : AppCompatActivity() {
             return
         }
 
+        if (project.nexts.isEmpty()) {
+            Toast.makeText(applicationContext, R.string.message_no_name_to_review, Toast.LENGTH_LONG).show()
+            finish()
+            return
+        }
+
         // create a copy
         nexts = ArrayList(project.nexts)
         scores = HashMap(project.scores)
@@ -72,26 +79,14 @@ class ScrollSearchActivity : AppCompatActivity() {
 
         sortNexts()
 
-        dropButton.text = String.format(getString(R.string.button_drop_percent), BabyNameProject.DROP_RATE_PERCENT)
-        dropButton.setOnClickListener {
-            dropDialog()
-        }
-
         sortButton.setOnClickListener {
             sortNexts()
         }
 
         sortPatternTextView.doOnTextChanged { text, start, count, after ->
-            //Log.d(this, text.toString())
             sortPattern = text.toString().split("\\s".toRegex())
 
             sortNexts()
-        }
-
-        if (nexts.size > 10) {
-            dropButton.visibility = View.VISIBLE
-        } else {
-            dropButton.visibility = View.GONE
         }
 
         ItemTouchHelper(object : ItemTouchHelper.SimpleCallback(
@@ -112,11 +107,10 @@ class ScrollSearchActivity : AppCompatActivity() {
                     val nameId = nexts.removeAt(position)
                     val scoreBackup = scores.remove(nameId)
 
-                    updateCounter()
-
                     val needSavingBackup =  needSaving
                     needSaving = true
 
+                    updateCounter()
                     scrollAdapter.notifyItemRemoved(position)
 
                     val snackbar = Snackbar.make(
@@ -142,30 +136,65 @@ class ScrollSearchActivity : AppCompatActivity() {
         }).attachToRecyclerView(recyclerView)
     }
 
-    private fun dropLast() {
-        if (nexts.size > 10) {
-            val amountToRemove = ((DROP_RATE_PERCENT *  nexts.size) / 100)
+    private fun dropUnratedDialog() {
+        val newNexts = nexts.filter { scores.containsKey(it) } as ArrayList<Int>
+        val amountToRemove = nexts.size - newNexts.size
 
-            // keep scores updated
-            for (idx in nexts.takeLast(amountToRemove)) {
-                scores.remove(idx)
-            }
+        Log.d(this, "dropUnratedDialog() newNexts.size: ${newNexts.size}, amountToRemove: ${amountToRemove}")
 
-            nexts = ArrayList(nexts.dropLast(amountToRemove))
-            needSaving = true
-
-            updateCounter()
-        }
-    }
-
-    private fun dropDialog() {
-        val amountToRemove = ((BabyNameProject.DROP_RATE_PERCENT * nexts.size) / 100)
-
-        builder.setTitle(R.string.dialog_drop_title)
-        builder.setMessage(String.format(getString(R.string.dialog_drop_message), amountToRemove, nexts.size))
+        builder.setTitle(R.string.dialog_drop_unrated_title)
+        builder.setMessage(String.format(getString(R.string.dialog_drop_unrated_message), amountToRemove, nexts.size))
 
         builder.setPositiveButton(R.string.yes) { dialog, _ ->
-            dropLast()
+            if (amountToRemove > 0) {
+                nexts = newNexts
+                needSaving = true
+
+                updateCounter()
+                scrollAdapter.notifyDataSetChanged()
+                recyclerView.scrollToPosition(0)
+            }
+            dialog.dismiss()
+        }
+
+        builder.setNegativeButton(R.string.no) { dialog, which ->
+            dialog.dismiss()
+        }
+
+        val alert = builder.create()
+        alert.show()
+    }
+
+    private fun drop20PCDialog() {
+        val amountToRemove = ((BabyNameProject.DROP_RATE_PERCENT * nexts.size) / 100)
+
+        builder.setTitle(R.string.dialog_drop_worst_title)
+        builder.setMessage(String.format(getString(R.string.dialog_drop_worst_message), amountToRemove, nexts.size))
+
+        builder.setPositiveButton(R.string.yes) { dialog, _ ->
+            if (amountToRemove > 0) {
+                // sort by score, lowest scores last
+                val nextCopy = ArrayList(nexts)
+                nextCopy.sortWith { i1: Int, i2: Int ->
+                    (2 * ((scores[i2] ?: 0F) - (scores[i1] ?: 0F))).toInt()
+                }
+                val dropSet = HashSet(nextCopy.takeLast(amountToRemove))
+
+                // keep scores updated
+                for (idx in dropSet) {
+                    scores.remove(idx)
+                }
+
+                // jump to first
+                nexts = nexts.filter { !dropSet.contains(it) } as ArrayList<Int>
+                needSaving = true
+
+                updateCounter()
+
+                scrollAdapter.notifyDataSetChanged()
+                recyclerView.scrollToPosition(0)
+            }
+
             dialog.dismiss()
         }
 
@@ -284,14 +313,46 @@ class ScrollSearchActivity : AppCompatActivity() {
     }
 
     public override fun onStop() {
-        val nextsSet = HashSet(nexts)
-        project.nexts = project.nexts.filter { nextsSet.contains(it) }
-        project.scores = scores
-        project.needSaving = needSaving
+        if (needSaving) {
+            val nextsSet = HashSet(nexts)
+            project.nexts = project.nexts.filter { nextsSet.contains(it) }
+            project.scores = scores
+            project.needSaving = needSaving
 
-        MainActivity.instance?.updateView()
+            MainActivity.instance?.updateView()
+        }
 
         super.onStop()
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu): Boolean {
+        Log.d(this, "onCreateOptionsMenu()")
+
+        val titles = listOf(R.string.menu_drop_unrated, R.string.menu_drop_worst_20pc, R.string.menu_abort)
+        for (title in titles) {
+            menu.add(0, title, 0, title)
+        }
+
+        return true
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        Log.d(this, "onOptionsItemSelected() ${item.itemId}")
+
+        when (item.itemId) {
+            R.string.menu_drop_unrated -> {
+                dropUnratedDialog()
+            }
+            R.string.menu_drop_worst_20pc -> {
+                drop20PCDialog()
+            }
+            R.string.menu_abort -> {
+                needSaving = false
+                finish()
+            }
+        }
+
+        return super.onOptionsItemSelected(item)
     }
 
     fun getHighlightedName(name: String): SpannableString {

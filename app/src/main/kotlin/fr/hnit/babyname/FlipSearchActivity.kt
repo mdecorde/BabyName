@@ -5,11 +5,12 @@
 
 package fr.hnit.babyname
 
-import android.content.DialogInterface
 import android.graphics.Color
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
+import android.view.Menu
+import android.view.MenuItem
 import android.widget.Button
 import android.widget.ImageView
 import android.widget.LinearLayout
@@ -27,7 +28,7 @@ open class FlipSearchActivity : AppCompatActivity() {
 
     private var nexts = ArrayList<Int>()
     private var scores = HashMap<Int, Float>()
-    private var nextsIndex = 0
+    private var nextsIndex = -1
     private var needSaving = false
 
     private lateinit var backgroundImage: ImageView
@@ -80,10 +81,15 @@ open class FlipSearchActivity : AppCompatActivity() {
         nextsIndex = project.nextsIndex
         needSaving = project.needSaving
 
+        // make nextsIndex valid
+        if ((nextsIndex < 0 || nextsIndex >= nexts.size) && nexts.isNotEmpty()) {
+            nextsIndex = 0
+        }
+
         currentBabyName = getCurrentName()
 
         if (currentBabyName == null) {
-            Toast.makeText(this@FlipSearchActivity, R.string.message_no_name_to_review, Toast.LENGTH_LONG).show()
+            Toast.makeText(applicationContext, R.string.message_no_name_to_review, Toast.LENGTH_LONG).show()
             finish()
         } else {
             updateName()
@@ -96,7 +102,7 @@ open class FlipSearchActivity : AppCompatActivity() {
                 scores[babyName.id] = rating
 
                 Toast.makeText(
-                    this,
+                    applicationContext,
                     String.format(
                         getString(R.string.name_rated_score),
                         babyName.name,
@@ -118,31 +124,47 @@ open class FlipSearchActivity : AppCompatActivity() {
         }
     }
 
-    private fun updateName() {
-        val babyName = currentBabyName
-        if (babyName == null) {
-            // last or first name reached
-            builder.setTitle(R.string.finish_round_title)
-            builder.setMessage(String.format(getString(R.string.finish_round_message), DROP_RATE_PERCENT))
-            builder.setPositiveButton(R.string.yes) { dialog: DialogInterface, id: Int ->
-                nextRound()
-                dialog.dismiss()
-                finish()
-            }
-            builder.setNegativeButton(R.string.no) { dialog: DialogInterface, id: Int ->
-                dialog.dismiss()
-            }
-            builder.show()
+    private fun updateButtons() {
+        fun enableButton(button: Button, isEnabled: Boolean) {
+            button.isEnabled = isEnabled
+            button.alpha = if (isEnabled) 1f else 0.5f
+        }
+
+        if (nextsIndex == 0) {
+            // first name
+            enableButton(previousButton, false)
+            enableButton(nextButton, true)
+        } else if ((nextsIndex + 1) == nexts.size) {
+            // last name
+            enableButton(previousButton, true)
+            enableButton(nextButton, false)
         } else {
+            enableButton(previousButton, true)
+            enableButton(nextButton, true)
+        }
+    }
+
+    private fun updateName() {
+        updateButtons()
+
+        val babyName = currentBabyName
+        if (babyName != null) {
             nameText.text = babyName.name
 
             extraText.text = babyName.getMetaString(applicationContext)
 
-            progressCounterText.text = String.format("(%d/%d)", nextsIndex + 1, nexts.size)
-            progressPercentText.text = String.format("%d%%", (100 * nextsIndex) / nexts.size)
+            val currentNumber = nextsIndex + 1
+            progressCounterText.text = String.format("(%d/%d)", currentNumber, nexts.size)
+            progressPercentText.text = String.format("%d%%", (100 * currentNumber) / nexts.size)
 
             // set existing score or default to 0
-            rateBar.rating = (scores[babyName.id] ?: 0).toFloat() / 2.0F
+            rateBar.rating = scores[babyName.id] ?: 0F
+        } else {
+            // should only happen when all names have been removed
+            if (nexts.isEmpty()) {
+                Toast.makeText(applicationContext, R.string.message_no_name_to_review, Toast.LENGTH_LONG).show()
+                finish()
+            }
         }
     }
 
@@ -152,10 +174,12 @@ open class FlipSearchActivity : AppCompatActivity() {
     }
 
     private fun removeName() {
-        val position = nextsIndex
-        val nameId = nexts.removeAt(position)
+        val nameId = nexts.removeAt(nextsIndex)
         val scoreBackup = scores.remove(nameId)
+        val nextsIndexBackup = nextsIndex
         val needSavingBackup = needSaving
+        nextsIndex = nextsIndex.coerceAtMost(nexts.size - 1)
+
         needSaving = true
 
         currentBabyName = getCurrentName()
@@ -167,7 +191,8 @@ open class FlipSearchActivity : AppCompatActivity() {
             Snackbar.LENGTH_LONG
         )
         snackbar.setAction(R.string.undo) {
-            nexts.add(position, nameId)
+            nexts.add(nextsIndexBackup, nameId)
+            nextsIndex = nextsIndexBackup
             needSaving = needSavingBackup
             if (scoreBackup != null) {
                 scores[nameId] = scoreBackup
@@ -208,46 +233,132 @@ open class FlipSearchActivity : AppCompatActivity() {
         }
     }
 
-    private fun nextRound() {
-        // sort by score, lowest scores last
-        nexts.sortWith { i1: Int, i2: Int -> (2 * ((scores[i2] ?: 0F) - (scores[i1] ?: 0F))).toInt() }
-
-        dropLast()
-
-        nexts.shuffle()
-
-        nextsIndex = 0
-
-        needSaving = true
-    }
-
-    private fun dropLast() {
-        if (nexts.size > 10) {
-            val amountToRemove = ((DROP_RATE_PERCENT *  nexts.size) / 100)
-
-            // keep scores updated
-            for (idx in nexts.takeLast(amountToRemove)) {
-                scores.remove(idx)
-            }
-
-            nexts = ArrayList(nexts.dropLast(amountToRemove))
-            needSaving = true
-        }
-    }
-
     private fun previousName() {
         currentBabyName = getPreviousName()
         updateName()
     }
 
+    private fun dropUnratedDialog() {
+        val newNexts = nexts.filter { scores.containsKey(it) } as ArrayList<Int>
+        val amountToRemove = nexts.size - newNexts.size
+
+        builder.setTitle(R.string.dialog_drop_unrated_title)
+        builder.setMessage(String.format(getString(R.string.dialog_drop_unrated_message), amountToRemove, nexts.size))
+
+        builder.setPositiveButton(R.string.yes) { dialog, _ ->
+            if (amountToRemove > 0) {
+                nexts = newNexts
+                nextsIndex = -1
+                needSaving = true
+                nextName()
+            }
+            dialog.dismiss()
+        }
+
+        builder.setNegativeButton(R.string.no) { dialog, which ->
+            dialog.dismiss()
+        }
+
+        val alert = builder.create()
+        alert.show()
+    }
+
+    private fun drop20PCDialog() {
+        val amountToRemove = ((DROP_RATE_PERCENT * nexts.size) / 100)
+
+        builder.setTitle(R.string.dialog_drop_worst_title)
+        builder.setMessage(String.format(getString(R.string.dialog_drop_worst_message), amountToRemove, nexts.size))
+
+        builder.setPositiveButton(R.string.yes) { dialog, _ ->
+            if (amountToRemove > 0) {
+                // sort by score, lowest scores last
+                val nextCopy = ArrayList(nexts)
+                nextCopy.sortWith { i1: Int, i2: Int ->
+                    (2 * ((scores[i2] ?: 0F) - (scores[i1] ?: 0F))).toInt()
+                }
+                val dropSet = HashSet(nextCopy.takeLast(amountToRemove))
+
+                // keep scores updated
+                for (idx in dropSet) {
+                    scores.remove(idx)
+                }
+
+                // jump to first
+                nexts = nexts.filter { !dropSet.contains(it) } as ArrayList<Int>
+                nextsIndex = -1
+                needSaving = true
+                nextName()
+            }
+
+            dialog.dismiss()
+        }
+
+        builder.setNegativeButton(R.string.no) { dialog, which ->
+            dialog.dismiss()
+        }
+
+        val alert = builder.create()
+        alert.show()
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu): Boolean {
+        Log.d(this, "onCreateOptionsMenu()")
+
+        val titles = listOf(R.string.menu_shuffle, R.string.menu_drop_unrated, R.string.menu_drop_worst_20pc,
+            R.string.menu_jump_start, R.string.menu_jump_end, R.string.menu_abort)
+        for (title in titles) {
+            menu.add(0, title, 0, title)
+        }
+
+        return true
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        Log.d(this, "onOptionsItemSelected() ${item.itemId}")
+
+        when (item.itemId) {
+            R.string.menu_shuffle -> {
+                nexts.shuffle()
+                nextsIndex = -1
+                needSaving = true
+                nextName()
+            }
+            R.string.menu_drop_unrated -> {
+                dropUnratedDialog()
+            }
+            R.string.menu_drop_worst_20pc -> {
+                drop20PCDialog()
+            }
+            R.string.menu_jump_start -> {
+                nextsIndex = -1
+                needSaving = true
+                nextName()
+            }
+            R.string.menu_jump_end -> {
+                if (nexts.isNotEmpty()) {
+                    nextsIndex = nexts.size - 2
+                    needSaving = true
+                }
+                nextName()
+            }
+            R.string.menu_abort -> {
+                needSaving = false
+                finish()
+            }
+        }
+
+        return super.onOptionsItemSelected(item)
+    }
+
     public override fun onStop() {
-        project.nexts = nexts
-        project.scores = scores
-        project.nextsIndex = nextsIndex
-        project.needSaving = needSaving
+        if (needSaving) {
+            project.nexts = nexts
+            project.scores = scores
+            project.nextsIndex = nextsIndex
+            project.needSaving = true
 
-        MainActivity.instance?.updateView()
-
+            MainActivity.instance?.updateView()
+        }
         super.onStop()
     }
 }

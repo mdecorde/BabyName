@@ -21,10 +21,14 @@ class BabyNameProject() : Serializable {
     var gender = GenderSelection.ALL
     var origins = HashSet<String>()
     var originsLogic = OriginsLogic.OR
-    var pattern: Pattern? = null
+    // A regular expression.
+    var pattern = Pattern.compile(".*")
+    // Scores. Each key must always be present in nexts.
     var scores = HashMap<Int, Float>()
+    // List of indexes into the database
     var nexts = listOf<Int>()
-    var nextsIndex = 0
+    // Index into nexts, may be -1 .. (nexts.size - 1)
+    var nextsIndex = -1
 
     enum class OriginsLogic {
         OR,
@@ -37,11 +41,6 @@ class BabyNameProject() : Serializable {
         MALE,
         FEMALE,
         NEUTRAL
-    }
-
-    init {
-        pattern = Pattern.compile(".*")
-        reset()
     }
 
     fun cloneProject(): BabyNameProject {
@@ -81,7 +80,7 @@ class BabyNameProject() : Serializable {
             val newIndex = map.get(next)
             if (newIndex != null) {
                 // invalidate
-                nextsIndex = 0
+                nextsIndex = -1
 
                 if (newIndex >= 0) {
                     // new index
@@ -152,31 +151,11 @@ class BabyNameProject() : Serializable {
             }
         }
 
-        if (pattern != null) {
-            return pattern!!.matcher(name.name).matches()
+        if (pattern.toString() != ".*") {
+            return pattern.matcher(name.name).matches()
         }
+
         return true
-    }
-
-    fun rebuildNexts() {
-        val newNexts = mutableListOf<Int>()
-        for (i in 0 until MainActivity.database.size()) {
-            if (isNameValid(MainActivity.database.get(i))) {
-                newNexts.add(i)
-            }
-        }
-        newNexts.shuffle()
-
-        nexts = newNexts
-        nextsIndex = 0
-    }
-
-    fun reset() {
-        scores.clear()
-
-        rebuildNexts()
-
-        needSaving = true
     }
 
     fun getTop10(): List<Int> {

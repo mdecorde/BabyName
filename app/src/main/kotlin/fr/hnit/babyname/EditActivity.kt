@@ -11,7 +11,10 @@ import android.text.Editable
 import android.text.TextWatcher
 import android.view.Menu
 import android.view.MenuItem
+import android.view.View
+import android.widget.CheckBox
 import android.widget.EditText
+import android.widget.LinearLayout
 import android.widget.ListView
 import android.widget.RadioGroup
 import android.widget.TextView
@@ -28,6 +31,11 @@ class EditActivity : AppCompatActivity() {
     lateinit var genderRadio: RadioGroup
     lateinit var patternText: EditText
     lateinit var counterText: TextView
+    lateinit var keepCheckbox: CheckBox
+
+    // backup if this is not a new project
+    var existingNexts = listOf<Int>()
+    var existingScores = HashMap<Int, Float>()
 
     var loadFinished: Boolean = false
 
@@ -37,9 +45,10 @@ class EditActivity : AppCompatActivity() {
 
         originsListView = findViewById(R.id.origins_list)
         originsLogicRadio = findViewById(R.id.origins_logic_radio)
+        genderRadio = findViewById(R.id.gender_radio)
         patternText = findViewById(R.id.pattern_text)
         counterText = findViewById(R.id.counter_text)
-        genderRadio = findViewById(R.id.gender_radio)
+        keepCheckbox = findViewById(R.id.keep_checkbox)
 
         val defaultBackgroundColor = patternText.getDrawingCacheBackgroundColor()
         patternText.addTextChangedListener(object : TextWatcher {
@@ -83,20 +92,50 @@ class EditActivity : AppCompatActivity() {
             }
         }
 
+        keepCheckbox.setOnClickListener {
+            if (loadFinished) {
+                updateNameCounter()
+            }
+        }
+
         val projectIndex = intent.getIntExtra(MainActivity.PROJECT_EXTRA, -1)
         project = if (projectIndex == -1) {
+            // create new project
             BabyNameProject()
         } else {
+            // get existing project
             MainActivity.projects[projectIndex]
         }
 
         applyFromProject(project)
 
+        updateKeepNames()
+
         updateNameCounter()
         loadFinished = true
     }
 
+    private fun updateKeepNames() {
+        val keepText = findViewById<TextView>(R.id.keep_text)
+        val keepLayout = findViewById<LinearLayout>(R.id.keep_layout)
+        val existingNames = existingNexts.isNotEmpty()
+
+        // Show checkbox setting only when we edit
+        // an existing project that still has names.
+        if (existingNames) {
+            keepText.text = String.format(getString(R.string.keep_existing_names), existingNexts.size)
+            keepLayout.visibility = View.VISIBLE
+        } else {
+            keepText.text = ""
+            keepLayout.visibility = View.GONE
+        }
+    }
+
     fun applyFromProject(project: BabyNameProject) {
+        // backup existing nexts and scores
+        existingNexts = project.nexts
+        existingScores = project.scores
+
         val genderSelection = when (project.gender) {
             BabyNameProject.GenderSelection.ALL -> R.id.gender_all_radio
             BabyNameProject.GenderSelection.MALE -> R.id.gender_male_radio
@@ -177,7 +216,28 @@ class EditActivity : AppCompatActivity() {
             return false
         }
 
-        project.rebuildNexts()
+        val newNexts = mutableListOf<Int>()
+        for (i in 0 until MainActivity.database.size()) {
+            if (project.isNameValid(MainActivity.database.get(i))) {
+                newNexts.add(i)
+            }
+        }
+
+        // keep previous nexts and scores (if this is not a new project)
+        if (keepCheckbox.isChecked) {
+            newNexts.addAll(existingNexts)
+            newNexts.addAll(existingScores.keys)
+
+            project.nexts = newNexts.distinct().shuffled()
+            project.scores = existingScores
+            project.nextsIndex = -1
+        } else {
+            project.nexts = newNexts.shuffled()
+            project.scores.clear()
+            project.nextsIndex = -1
+        }
+
+        project.nextsIndex = -1
         project.needSaving = true
 
         return true
@@ -185,19 +245,13 @@ class EditActivity : AppCompatActivity() {
 
     fun updateNameCounter() {
         //Log.d("updateNameCounter()");
-        var count = 0
 
         val tmp = BabyNameProject()
-        if (storeToProject(tmp)) {
-            val n: Int = MainActivity.database.size()
-            for (i in 0 until n) {
-                if (tmp.isNameValid(MainActivity.database.get(i))) {
-                    count += 1
-                }
-            }
+        counterText.text = if (storeToProject(tmp)) {
+            String.format(getString(R.string.names_counter), tmp.nexts.size)
+        } else {
+            "???"
         }
-
-        counterText.text = String.format(getString(R.string.names_counter), count)
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {

@@ -107,6 +107,7 @@ class MainActivity : UpdateViewListener, AppCompatActivity() {
     }
 
     override fun onDestroy() {
+        instance = null
         storeProjects()
         super.onDestroy()
     }
@@ -234,6 +235,7 @@ class MainActivity : UpdateViewListener, AppCompatActivity() {
         builder.setPositiveButton(R.string.yes) { dialog, _ ->
             projects.remove(project)
             this@MainActivity.deleteFile(project.iD + ".baby")
+            updateNoBabyMessage()
             adapter.notifyDataSetChanged()
             dialog.dismiss()
         }
@@ -299,29 +301,23 @@ class MainActivity : UpdateViewListener, AppCompatActivity() {
         } + " "
 
         text += " " + if (originsTranslated.size == 1) {
-            String.format(getString(R.string.origin_is), originsTranslated[0])
+            String.format(getString(R.string.description_origin_is), originsTranslated[0])
         } else if (p.origins.size > 1) {
-            String.format(getString(R.string.origin_are), originsTranslated.joinToString(separator))
+            String.format(getString(R.string.description_origin_are), originsTranslated.joinToString(separator))
         } else {
             getString(R.string.no_origin)
         }
 
         if (p.pattern != null && ".*" != p.pattern.toString()) {
-            text += " " + String.format(getString(R.string.matches_with), p.pattern)
+            text += " " + String.format(getString(R.string.description_matches_with), p.pattern)
         }
 
-        //Log.d(this, "p.nexts.size: ${p.nexts.size}, p.scores.size: ${p.scores.size} p.nextsIndex: ${p.nextsIndex}, remainingNames: ${p.nexts.size - p.nextsIndex}")
-
-        if (p.nexts.size == 1) {
-            text += " " + getString(R.string.one_remaining_name)
-        } else {
-            val remainingNames = p.nexts.size - p.nextsIndex
-            text += " " + String.format(getString(R.string.remaining_names), remainingNames)
-        }
+        val ratedPC = (100 * p.scores.size) / p.nexts.size.coerceAtLeast(1)
+        text += " " + String.format(getString(R.string.description_stats), p.nexts.size, ratedPC)
 
         val bestName = p.getBest()
         if (p.scores.isNotEmpty() && bestName != null) {
-            text += " " + String.format(getString(R.string.best_match_is), bestName.name)
+            text += " " + String.format(getString(R.string.description_best_match_is), bestName.name)
         }
 
         return text
@@ -382,11 +378,6 @@ class MainActivity : UpdateViewListener, AppCompatActivity() {
     private fun doNewBaby() {
         Toast.makeText(this, R.string.new_baby, Toast.LENGTH_LONG).show()
         doEditProject(null)
-    }
-
-    override fun onStop() {
-        instance = null
-        super.onStop()
     }
 
     companion object {

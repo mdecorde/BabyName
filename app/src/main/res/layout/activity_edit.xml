@@ -12,7 +12,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="10dp"
-        android:layout_marginBottom="30dp"
+        android:layout_marginBottom="15dp"
         android:layout_gravity="center">
 
         <TextView
@@ -103,7 +103,7 @@
             android:layout_marginEnd="10dp"
             android:text="@string/pattern"
             android:textAppearance="?android:attr/textAppearanceLarge"
-            android:singleLine="true"  />
+            android:singleLine="true" />
 
         <EditText
             android:layout_width="match_parent"
@@ -171,19 +171,39 @@
 
     </LinearLayout>
 
-    <ScrollView
-        android:layout_width="wrap_content"
-        android:layout_height="match_parent"
-        android:id="@+id/scrollView"
-        android:layout_margin="16dp">
+    <LinearLayout
+        android:id="@+id/keep_layout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="16dp"
+        android:layout_marginVertical="8dp"
+        android:orientation="horizontal">
 
         <TextView
+            android:id="@+id/keep_text"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textAppearance="?android:attr/textAppearanceSmall"
-            android:text="@string/pattern_help"
-            android:id="@+id/textView"
-            android:autoLink="web" />
-    </ScrollView>
+            android:textAppearance="?android:attr/textAppearanceLarge"
+            android:singleLine="true"
+            android:ellipsize="none"/>
+
+        <CheckBox
+            android:id="@+id/keep_checkbox"
+            android:checked="true"
+            android:layout_marginEnd="10dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"/>
+
+    </LinearLayout>
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginVertical="8dp"
+        android:layout_marginHorizontal="16dp"
+        android:textAppearance="?android:attr/textAppearanceSmall"
+        android:text="@string/pattern_help"
+        android:id="@+id/textView"
+        android:autoLink="web" />
 
 </LinearLayout>

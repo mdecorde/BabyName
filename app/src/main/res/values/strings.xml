@@ -10,10 +10,10 @@
     <string name="action_top_baby">Top 10!</string>
     <string name="all_names_reviewed">All names have been reviewed!</string>
     <string name="app_name">Baby Name</string>
-    <string name="best_match_is" formatted="false">Best match is \'%s\'.</string>
     <string name="boy">Boy</string>
     <string name="boy_name">A boy which</string>
     <string name="boy_or_girl_name">A boy or a girl which</string>
+    <string name="button_drop_20_percent">Drop 20%</string>
     <string name="button_drop_percent">Drop last %d%%</string>
     <string name="button_export">Export</string>
     <string name="button_import_merge">Import\n&amp;\nMerge</string>
@@ -23,10 +23,17 @@
     <string name="delete">Delete</string>
     <string name="delete_question_content">Do you really really really want to delete this search?</string>
     <string name="delete_question_title">Delete search</string>
-    <string name="dialog_drop_message">Drop last %d of %d names?</string>
-    <string name="dialog_drop_title">Drop</string>
-    <string name="button_drop_20_percent">Drop 20%</string>
-    <string name="settings_next_on_rating">Next Name on Rating</string>
+    <string name="description_best_match_is" formatted="false">Best match is \'%s\'.</string>
+    <string name="description_matches_with" formatted="false">Matches with \'%s\'.</string>
+    <string name="description_origin_are" formatted="false">origins are %s.</string>
+    <string name="description_origin_is" formatted="false">origin is %s.</string>
+    <string name="description_stats">"%d names total. %d%% have been rated."</string>
+    <string name="dialog_drop_unrated_message">Drop %d unrated of %d names?</string>
+    <string name="dialog_drop_unrated_title">Drop Unrated</string>
+    <string name="dialog_drop_worst_message">Drop worst 20%% (%d) of %d names?</string>
+    <string name="dialog_drop_worst_title">Drop Worst</string>
+    <string name="done">Done</string>
+    <string name="dropped_names">Dropped %d names</string>
     <string name="edit_title">Baby Name Preferences</string>
     <string name="finish_round_message">End round, remove worst %d%% of names and shuffle?</string>
     <string name="finish_round_title">Finish</string>
@@ -39,11 +46,17 @@
     <string name="girl_name">A girl whose</string>
     <string name="go">Go</string>
     <string name="home_text">Baby name projects \n(click \'new\' to start a project)</string>
-    <string name="matches_with" formatted="false">Matches with \'%s\'.</string>
+    <string name="keep_existing_names">Keep %d existing names:</string>
+    <string name="menu_abort">Abort</string>
     <string name="menu_about">About</string>
     <string name="menu_database">Database</string>
+    <string name="menu_drop_unrated">Drop Unrated</string>
+    <string name="menu_drop_worst_20pc">Drop Worst 20%</string>
+    <string name="menu_jump_end">Jump to End</string>
+    <string name="menu_jump_start">Jump to Start</string>
     <string name="menu_new_baby">New Baby</string>
     <string name="menu_settings">Settings</string>
+    <string name="menu_shuffle">Shuffle</string>
     <string name="message_no_name_to_review">No names to review!</string>
     <string name="n_name_left" formatted="false">%d left.</string>
     <string name="name_pattern_malformed" formatted="false">Name pattern is malformed : \n%s</string>
@@ -54,15 +67,13 @@
     <string name="new_baby">New baby! \\o/</string>
     <string name="next">Next</string>
     <string name="no">No</string>
-    <string name="no_baby">No Baby!\nUse the menu to create a new name project.</string>
+    <string name="no_baby">No Baby!</string>
+    <string name="no_more_names">No more names.</string>
     <string name="no_name_rated">No name rated yet. Start by pressing any search button.</string>
     <string name="no_origin">has no specific origin.</string>
     <string name="no_pattern">has no specific pattern.</string>
     <string name="no_remaining_loop" formatted="false">No remaining names to review (loop=%d). Start a new review loop with %d names?</string>
     <string name="ok">OK</string>
-    <string name="one_remaining_name">One remaining name to review.</string>
-    <string name="origin_are" formatted="false">origins are %s.</string>
-    <string name="origin_is" formatted="false">origin is %s.</string>
     <string name="origin_item_african">African</string>
     <string name="origin_item_albanian">Albanian</string>
     <string name="origin_item_ancient_celtic">Ancient Celtic</string>
@@ -149,11 +160,11 @@
     <string name="previous">Previous</string>
     <string name="remaining_names" formatted="false">%d remaining names to review.</string>
     <string name="remove">Remove</string>
-    <string name="reset">Reset</string>
     <string name="reset_question_content">Do you want to reset this searches scores?</string>
     <string name="reset_question_title">Reset search scores</string>
     <string name="separator_and">and</string>
     <string name="separator_or">or</string>
+    <string name="settings_next_on_rating">Next Name on Rating</string>
     <string name="starting_new_loop">Starting a new review loop!</string>
     <string name="text_copied">Text copied.</string>
     <string name="too_much_constraint">Too much name constraint, no name found</string>

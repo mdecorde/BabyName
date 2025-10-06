@@ -63,16 +63,6 @@
             android:layout_margin="5dp"
             android:layout_weight="0.5"
             android:backgroundTint="@color/colorPrimary"
-            android:id="@+id/dropButton"
-            android:text="@string/button_drop_20_percent"
-            />
-
-        <Button
-            android:layout_width="0sp"
-            android:layout_height="wrap_content"
-            android:layout_margin="5dp"
-            android:layout_weight="0.5"
-            android:backgroundTint="@color/colorPrimary"
             android:id="@+id/sortButton"
             android:text="@string/button_sort"
             />
