@@ -1,0 +1,5 @@
+* add options menu to flip search and scroll search
+  * dialog to abort activity and drop any changes
+  * dialog to remove unrated names and worst 20% names
+  * jump to start/end option for flip search
+* allow to keep existing names/scores after a project has been edited
