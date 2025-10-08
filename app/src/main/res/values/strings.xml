@@ -23,10 +23,10 @@
     <string name="delete">Delete</string>
     <string name="delete_question_content">Do you really really really want to delete this search?</string>
     <string name="delete_question_title">Delete search</string>
-    <string name="description_best_match_is" formatted="false">Best match is \'%s\'.</string>
-    <string name="description_matches_with" formatted="false">Matches with \'%s\'.</string>
-    <string name="description_origin_are" formatted="false">origins are %s.</string>
-    <string name="description_origin_is" formatted="false">origin is %s.</string>
+    <string name="description_best_match_is">Best match is \'%s\'.</string>
+    <string name="description_matches_with">Matches with \'%s\'.</string>
+    <string name="description_origin_are">origins are %s.</string>
+    <string name="description_origin_is">origin is %s.</string>
     <string name="description_stats">"%d names total. %d%% have been rated."</string>
     <string name="dialog_drop_unrated_message">Drop %d unrated of %d names?</string>
     <string name="dialog_drop_unrated_title">Drop Unrated</string>
@@ -58,9 +58,9 @@
     <string name="menu_settings">Settings</string>
     <string name="menu_shuffle">Shuffle</string>
     <string name="message_no_name_to_review">No names to review!</string>
-    <string name="n_name_left" formatted="false">%d left.</string>
-    <string name="name_pattern_malformed" formatted="false">Name pattern is malformed : \n%s</string>
-    <string name="name_rated_score" formatted="false">%s rated: %.1f</string>
+    <string name="n_name_left">%d left.</string>
+    <string name="name_pattern_malformed">Name pattern is malformed : \n%s</string>
+    <string name="name_rated_score">%s rated: %.1f</string>
     <string name="name_was_removed">Name was removed from the list.</string>
     <string name="names_counter">(%d Names)</string>
     <string name="neutral_name">A neutral name which</string>
@@ -72,7 +72,7 @@
     <string name="no_name_rated">No name rated yet. Start by pressing any search button.</string>
     <string name="no_origin">has no specific origin.</string>
     <string name="no_pattern">has no specific pattern.</string>
-    <string name="no_remaining_loop" formatted="false">No remaining names to review (loop=%d). Start a new review loop with %d names?</string>
+    <string name="no_remaining_loop">No remaining names to review (loop=%d). Start a new review loop with %d names?</string>
     <string name="ok">OK</string>
     <string name="origin_item_african">African</string>
     <string name="origin_item_albanian">Albanian</string>
@@ -158,7 +158,7 @@
     <string name="pattern">Pattern:</string>
     <string name="pattern_help">The pattern is a regular expression. For instance: \n - \'.....+\' finds names with length greater than 5 letters, \n - \'R...+\' finds name starting with the \'R\' letter and length is greater than 4 letters, \n - \'.+r\' finds name ending with the \'r\' letter.\n\nMore informations at https://developer.android.com/reference/java/util/regex/Pattern.html</string>
     <string name="previous">Previous</string>
-    <string name="remaining_names" formatted="false">%d remaining names to review.</string>
+    <string name="remaining_names">%d remaining names to review.</string>
     <string name="remove">Remove</string>
     <string name="reset_question_content">Do you want to reset this searches scores?</string>
     <string name="reset_question_title">Reset search scores</string>
