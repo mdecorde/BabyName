@@ -81,7 +81,7 @@ open class FlipSearchActivity : AppCompatActivity() {
         nextsIndex = project.nextsIndex
         needSaving = project.needSaving
 
-        // make nextsIndex valid
+        // make nextsIndex valid (names might have been removed in ScrollSearch)
         if ((nextsIndex < 0 || nextsIndex >= nexts.size) && nexts.isNotEmpty()) {
             nextsIndex = 0
         }
@@ -239,15 +239,14 @@ open class FlipSearchActivity : AppCompatActivity() {
     }
 
     private fun dropUnratedDialog() {
-        val newNexts = nexts.filter { scores.containsKey(it) } as ArrayList<Int>
-        val amountToRemove = nexts.size - newNexts.size
+        val amountToRemove = nexts.count { !scores.containsKey(it) }
 
         builder.setTitle(R.string.dialog_drop_unrated_title)
         builder.setMessage(String.format(getString(R.string.dialog_drop_unrated_message), amountToRemove, nexts.size))
 
         builder.setPositiveButton(R.string.yes) { dialog, _ ->
             if (amountToRemove > 0) {
-                nexts = newNexts
+                nexts.removeAll { !scores.containsKey(it) }
                 nextsIndex = -1
                 needSaving = true
                 nextName()
@@ -284,9 +283,10 @@ open class FlipSearchActivity : AppCompatActivity() {
                 }
 
                 // jump to first
-                nexts = nexts.filter { !dropSet.contains(it) } as ArrayList<Int>
+                nexts.removeAll { dropSet.contains(it) }
                 nextsIndex = -1
                 needSaving = true
+
                 nextName()
             }
 
