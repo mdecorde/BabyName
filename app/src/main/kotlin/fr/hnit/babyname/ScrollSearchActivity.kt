@@ -137,20 +137,18 @@ class ScrollSearchActivity : AppCompatActivity() {
     }
 
     private fun dropUnratedDialog() {
-        val newNexts = nexts.filter { scores.containsKey(it) } as ArrayList<Int>
-        val amountToRemove = nexts.size - newNexts.size
-
-        Log.d(this, "dropUnratedDialog() newNexts.size: ${newNexts.size}, amountToRemove: ${amountToRemove}")
+        val amountToRemove = nexts.count { !scores.containsKey(it) }
 
         builder.setTitle(R.string.dialog_drop_unrated_title)
         builder.setMessage(String.format(getString(R.string.dialog_drop_unrated_message), amountToRemove, nexts.size))
 
         builder.setPositiveButton(R.string.yes) { dialog, _ ->
             if (amountToRemove > 0) {
-                nexts = newNexts
+                nexts.removeAll { !scores.containsKey(it) }
                 needSaving = true
 
                 updateCounter()
+
                 scrollAdapter.notifyDataSetChanged()
                 recyclerView.scrollToPosition(0)
             }
@@ -166,7 +164,7 @@ class ScrollSearchActivity : AppCompatActivity() {
     }
 
     private fun drop20PCDialog() {
-        val amountToRemove = ((BabyNameProject.DROP_RATE_PERCENT * nexts.size) / 100)
+        val amountToRemove = ((DROP_RATE_PERCENT * nexts.size) / 100)
 
         builder.setTitle(R.string.dialog_drop_worst_title)
         builder.setMessage(String.format(getString(R.string.dialog_drop_worst_message), amountToRemove, nexts.size))
@@ -185,8 +183,7 @@ class ScrollSearchActivity : AppCompatActivity() {
                     scores.remove(idx)
                 }
 
-                // jump to first
-                nexts = nexts.filter { !dropSet.contains(it) } as ArrayList<Int>
+                nexts.removeAll { dropSet.contains(it) }
                 needSaving = true
 
                 updateCounter()
@@ -314,8 +311,19 @@ class ScrollSearchActivity : AppCompatActivity() {
 
     public override fun onStop() {
         if (needSaving) {
-            val nextsSet = HashSet(nexts)
-            project.nexts = project.nexts.filter { nextsSet.contains(it) }
+            // update project.nexts but keep order
+            val newNextsSet = HashSet(nexts)
+            val newNexts =  project.nexts.filter { newNextsSet.contains(it) }
+
+            // fixup project.nextsIndex (in case the value got deleted from nexts)
+            if (project.nextsIndex >= 0 && project.nextsIndex < project.nexts.size) {
+                val oldNextId = project.nexts[project.nextsIndex]
+                project.nextsIndex = newNexts.indexOf(oldNextId)
+            } else {
+                project.nextsIndex = -1
+            }
+
+            project.nexts = newNexts
             project.scores = scores
             project.needSaving = needSaving
 
