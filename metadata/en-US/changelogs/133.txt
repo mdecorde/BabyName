@@ -1,0 +1,1 @@
+* fix screen update when names are dropped (unrated and 20%)
