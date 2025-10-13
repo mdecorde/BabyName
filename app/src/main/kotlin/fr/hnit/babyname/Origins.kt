@@ -8,12 +8,83 @@ package fr.hnit.babyname
 import android.content.Context
 
 internal object Origins {
-    fun getLocaleOrigin(ctx: Context, origin: String?): String {
-        if (origin == null) {
-            return ""
+    fun getLocaleOriginGender(ctx: Context, gender: BabyName.Gender): String {
+        val id = when (gender) {
+            BabyName.Gender.MALE -> R.string.gender_male
+            BabyName.Gender.FEMALE -> R.string.gender_female
+            BabyName.Gender.SOMEWHAT_MALE -> R.string.gender_somewhat_male
+            BabyName.Gender.SOMEWHAT_FEMALE -> R.string.gender_somewhat_female
+            BabyName.Gender.MOSTLY_MALE -> R.string.gender_mostly_male
+            BabyName.Gender.MOSTLY_FEMALE -> R.string.gender_mostly_female
+            BabyName.Gender.UNISEX -> R.string.gender_unisex
         }
+        return ctx.getString(id)
+    }
 
-        val id = when (origin) {
+    fun getLocaleOriginName(ctx: Context, originName: String): String {
+        val id = when (originName) {
+            "Great Britain" -> R.string.origin_item_great_britain
+            "Ireland" -> R.string.origin_item_ireland
+            "U.S.A." -> R.string.origin_item_usa
+            "Italy" -> R.string.origin_item_italy
+            "Malta" -> R.string.origin_item_malta
+            "Portugal" -> R.string.origin_item_portugal
+            "Spain" -> R.string.origin_item_spain
+            "France" -> R.string.origin_item_france
+            "Belgium" -> R.string.origin_item_belgium
+            "Luxembourg" -> R.string.origin_item_luxembourg
+            "Netherlands" -> R.string.origin_item_netherlands
+            "East Frisia" -> R.string.origin_item_east_frisia
+            "Germany" -> R.string.origin_item_germany
+            "Austria" -> R.string.origin_item_austria
+            "Swiss" -> R.string.origin_item_swiss
+            "Iceland" -> R.string.origin_item_iceland
+            "Denmark" -> R.string.origin_item_denmark
+            "Norway" -> R.string.origin_item_norway
+            "Sweden" -> R.string.origin_item_sweden
+            "Finland" -> R.string.origin_item_finland
+            "Estonia" -> R.string.origin_item_estonia
+            "Latvia" -> R.string.origin_item_latvia
+            "Lithuania" -> R.string.origin_item_lithuania
+            "Poland" -> R.string.origin_item_poland
+            "Czech Republic" -> R.string.origin_item_czech_republic
+            "Slovakia" -> R.string.origin_item_slovakia
+            "Hungary" -> R.string.origin_item_hungary
+            "Romania" -> R.string.origin_item_romania
+            "Bulgaria" -> R.string.origin_item_bulgaria
+            "Bosnia and Herzegovina" -> R.string.origin_item_bosnia_and_herzegovina
+            "Croatia" -> R.string.origin_item_croatia
+            "Kosovo" -> R.string.origin_item_kosovo
+            "Macedonia" -> R.string.origin_item_macedonia
+            "Montenegro" -> R.string.origin_item_montenegro
+            "Serbia" -> R.string.origin_item_serbia
+            "Slovenia" -> R.string.origin_item_slovenia
+            "Albania" -> R.string.origin_item_albania
+            "Greece" -> R.string.origin_item_greece
+            "Russia" -> R.string.origin_item_russia
+            "Belarus" -> R.string.origin_item_belarus
+            "Moldova" -> R.string.origin_item_moldova
+            "Ukraine" -> R.string.origin_item_ukraine
+            "Armenia" -> R.string.origin_item_armenia
+            "Azerbaijan" -> R.string.origin_item_azerbaijan
+            "Georgia" -> R.string.origin_item_georgia
+            "Kazakhstan" -> R.string.origin_item_kazakhstan
+            "Kyrgyzstan" -> R.string.origin_item_kyrgyzstan
+            "Tajikistan" -> R.string.origin_item_tajikistan
+            "Turkmenistan" -> R.string.origin_item_turkmenistan
+            "Uzbekistan" -> R.string.origin_item_uzbekistan
+            "Turkey" -> R.string.origin_item_turkey
+            "Arabia/Persia" -> R.string.origin_item_arabia_persia
+            "Israel" -> R.string.origin_item_israel
+            "China" -> R.string.origin_item_china
+            "India" -> R.string.origin_item_india
+            "Sri Lanka" -> R.string.origin_item_sri_lanka
+            "Japan" -> R.string.origin_item_japan
+            "Korea" -> R.string.origin_item_korea
+            "Vietnam" -> R.string.origin_item_vietnam
+            "other" -> R.string.origin_item_other
+
+/*
             "african" -> R.string.origin_item_african
             "albanian" -> R.string.origin_item_albanian
             "ancientceltic" -> R.string.origin_item_ancient_celtic
@@ -94,6 +165,7 @@ internal object Origins {
             "ukrainian" -> R.string.origin_item_ukrainian
             "vietnamese" -> R.string.origin_item_vietnamese
             "welsh" -> R.string.origin_item_welsh
+ */
             else -> null
         }
 
@@ -101,11 +173,8 @@ internal object Origins {
             return ctx.getString(id)
         }
 
-        Log.w(this, "Warning: missing translation for origin: $origin")
+        Log.w(this, "Warning: missing translation for origin: $originName")
 
-        // Fallback: Make first character upper case.
-        return origin.replaceFirstChar {
-            if (it.isLowerCase()) it.titlecase() else it.toString()
-        }
+        return originName
     }
 }

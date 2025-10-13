@@ -80,7 +80,7 @@ class MainActivity : UpdateViewListener, AppCompatActivity() {
 
             if (!BabyNameProject.storeProject(project, this)) {
                 Toast.makeText(
-                    this,
+                    applicationContext,
                     "Error: could not save changes to babyname project: $project",
                     Toast.LENGTH_LONG
                 ).show()
@@ -281,7 +281,7 @@ class MainActivity : UpdateViewListener, AppCompatActivity() {
     }
 
     fun projectToDescription(p: BabyNameProject): String {
-        var text = when (p.gender) {
+        var text = when (p.genderSelection) {
             BabyNameProject.GenderSelection.ALL -> getString(R.string.boy_or_girl_name)
             BabyNameProject.GenderSelection.MALE -> getString(R.string.boy_name)
             BabyNameProject.GenderSelection.FEMALE -> getString(R.string.girl_name)
@@ -290,19 +290,19 @@ class MainActivity : UpdateViewListener, AppCompatActivity() {
 
         // sort origins for display
         val originsTranslated = ArrayList(
-            p.origins.map { it -> Origins.getLocaleOrigin(applicationContext, it) }
+            p.originsSelection.map { it -> Origins.getLocaleOriginName(applicationContext, it) }
         )
 
         originsTranslated.sort()
 
-        val separator = " " + when (p.originsLogic) {
+        val separator = " " + when (p.originsSelectionLogic) {
             BabyNameProject.OriginsLogic.AND -> getString(R.string.separator_and)
             BabyNameProject.OriginsLogic.OR ->  getString(R.string.separator_or)
         } + " "
 
         text += " " + if (originsTranslated.size == 1) {
             String.format(getString(R.string.description_origin_is), originsTranslated[0])
-        } else if (p.origins.size > 1) {
+        } else if (p.originsSelection.size > 1) {
             String.format(getString(R.string.description_origin_are), originsTranslated.joinToString(separator))
         } else {
             getString(R.string.no_origin)

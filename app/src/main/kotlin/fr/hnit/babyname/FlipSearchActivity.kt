@@ -38,6 +38,7 @@ open class FlipSearchActivity : AppCompatActivity() {
     private lateinit var rateBar: RatingBar
     private lateinit var nameText: TextView
     private lateinit var extraText: TextView
+    private lateinit var descriptionText: TextView
     private lateinit var progressCounterText: TextView
     private lateinit var progressPercentText: TextView
     private lateinit var buttonLayout: LinearLayout
@@ -60,6 +61,7 @@ open class FlipSearchActivity : AppCompatActivity() {
         rateBar = findViewById(R.id.rate_bar)
         nameText = findViewById(R.id.name_text)
         extraText = findViewById(R.id.extra_text)
+        descriptionText = findViewById(R.id.description_text)
         progressCounterText = findViewById(R.id.progress_counter)
         progressPercentText = findViewById(R.id.progress_percent)
         buttonLayout = findViewById(R.id.buttons)
@@ -151,7 +153,8 @@ open class FlipSearchActivity : AppCompatActivity() {
         if (babyName != null) {
             nameText.text = babyName.name
 
-            extraText.text = babyName.getMetaString(applicationContext)
+            extraText.text = project.getShortOriginsString(applicationContext, babyName)
+            descriptionText.text = project.getLongOriginsString(applicationContext, babyName)
 
             val currentNumber = nextsIndex + 1
             progressCounterText.text = String.format("(%d/%d)", currentNumber, nexts.size)

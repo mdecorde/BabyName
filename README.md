@@ -1,12 +1,12 @@
 # Baby Name Android Application
 
-This app helps you to find out your baby name within from a lexicon of +10000 names (see http://www.lexique.org/public/prenoms.php).
+This app helps you to find out your baby name within from a lexicon of +60000 names (From https://www.heise.de/ct/ftp/07/17/182/).
 
 If you're thinking about changing your name — for a transition or any other reason — this app can also help you choose the name you want to reborn with ;)
 
 Features:
 
-* select boy/girl names
+* select boy/girl/unisex names
 * select names from different origins
 * give scores to names
 * sort name list to get similar names to the high scored names

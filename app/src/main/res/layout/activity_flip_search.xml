@@ -29,18 +29,35 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:gravity="center_horizontal"
+            android:textColor="@android:color/black"
             android:id="@+id/extra_text"
+            android:textSize="16sp"
             android:layout_gravity="center_horizontal"
             android:ellipsize="none" />
 
     </LinearLayout>
 
-    <ImageView
+    <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="400dp"
-        android:id="@+id/imageView"
-        android:layout_below="@+id/title_layout"
-        android:src="@drawable/tuxbaby" />
+        android:orientation="vertical"
+        android:layout_below="@+id/title_layout" >
+
+        <ImageView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:id="@+id/imageView"
+            android:alpha="0.2"
+            android:src="@drawable/tuxbaby" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:gravity="center"
+            android:id="@+id/description_text"
+            android:textSize="16sp"
+            android:ellipsize="none" />
+    </FrameLayout>
 
     <RatingBar
         android:layout_width="wrap_content"

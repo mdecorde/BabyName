@@ -13,8 +13,10 @@ import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 
 class ScrollSearchAdapter(private val scrollActivity: ScrollSearchActivity,
-        private val nexts: ArrayList<Int>, private val scores: HashMap<Int, Float>)
+        private val project: BabyNameProject, private val nexts: ArrayList<Int>, private val scores: HashMap<Int, Float>)
     : RecyclerView.Adapter<ScrollSearchAdapter.ViewHolder>() {
+
+    var onItemClick: ((BabyName) -> Unit)? = null
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         val view = LayoutInflater.from(parent.context)
@@ -32,7 +34,11 @@ class ScrollSearchAdapter(private val scrollActivity: ScrollSearchActivity,
         holder.rankView.text = "${position + 1}."
         holder.textView.text = scrollActivity.getHighlightedName(babyName.name)
         holder.rateBar.rating = scores[index] ?: 0F
-        holder.extraView.text = babyName.getMetaString(scrollActivity.applicationContext)
+        holder.extraView.text = project.getShortOriginsString(scrollActivity.applicationContext, babyName)
+
+        holder.extraView.setOnClickListener {
+            onItemClick?.invoke(babyName)
+        }
 
         holder.rateBar.onRatingBarChangeListener = RatingBar.OnRatingBarChangeListener {
                 ratingBar: RatingBar, rating: Float, fromUser: Boolean ->

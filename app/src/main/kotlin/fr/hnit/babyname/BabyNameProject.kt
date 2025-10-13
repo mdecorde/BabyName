@@ -15,12 +15,14 @@ import java.util.UUID
 import java.util.regex.Pattern
 import kotlin.math.min
 
+import fr.hnit.babyname.BabyName.Gender
+
 class BabyNameProject() : Serializable {
     var needSaving = false
     var iD: String = UUID.randomUUID().toString()
-    var gender = GenderSelection.ALL
-    var origins = HashSet<String>()
-    var originsLogic = OriginsLogic.OR
+    var genderSelection = GenderSelection.ALL
+    var originsSelection = ArrayList<String>()
+    var originsSelectionLogic = OriginsLogic.OR
     // A regular expression.
     var pattern = Pattern.compile(".*")
     // Scores. Each key must always be present in nexts.
@@ -45,9 +47,9 @@ class BabyNameProject() : Serializable {
 
     fun cloneProject(): BabyNameProject {
         val project = BabyNameProject()
-        project.gender = gender
-        project.origins = origins.toHashSet()
-        project.originsLogic = originsLogic
+        project.genderSelection = genderSelection
+        project.originsSelection = ArrayList(originsSelection)
+        project.originsSelectionLogic = originsSelectionLogic
         project.pattern = pattern
         project.scores = HashMap(scores)
         project.nexts = nexts.toMutableList()
@@ -110,30 +112,91 @@ class BabyNameProject() : Serializable {
         scores = newScores
     }
 
+    fun getLongOriginsString(context: Context, name: BabyName): String {
+        return buildString {
+            for (origin in name.origins) {
+                append(Origins.getLocaleOriginName(context, origin.name))
+                append(": ")
+                append(Origins.getLocaleOriginGender(context, origin.gender))
+                if (origin.rarity != null) {
+                    append(" (")
+                    append(BabyName.getRarityApproximation(origin.rarity))
+                    append(")")
+                }
+                append("\n")
+            }
+        }
+    }
+
+    /*
+    * Show a simplified origin information.
+    * - Only origins that were used as match (4 at most).
+    * - Show genders only as Male/Female/Unisex.
+    * - No rarity.
+    */
+    fun getShortOriginsString(context: Context, name: BabyName): String {
+        fun showGender(gender: Gender): Boolean {
+            return when (genderSelection) {
+                GenderSelection.ALL -> gender == Gender.MALE || gender == Gender.FEMALE || gender == Gender.UNISEX
+                GenderSelection.MALE -> gender == Gender.MALE
+                GenderSelection.FEMALE -> gender == Gender.FEMALE
+                GenderSelection.NEUTRAL -> gender == Gender.UNISEX
+            }
+        }
+
+        fun simplifyGender(gender: Gender): Gender {
+            return when (gender) {
+                Gender.MALE, Gender.MOSTLY_MALE, -> Gender.MALE
+                Gender.FEMALE, Gender.MOSTLY_FEMALE -> Gender.FEMALE
+                Gender.UNISEX, Gender.SOMEWHAT_MALE, Gender.SOMEWHAT_FEMALE -> Gender.UNISEX
+            }
+        }
+
+        val matchedOrigins = if (originsSelection.isNotEmpty()) {
+            name.origins.filter { it.name in originsSelection }
+        } else {
+            name.origins.toList()
+        }
+        matchedOrigins.sortedBy { it.rarity }
+
+        val showNames = matchedOrigins.map { it.name }.distinct().take(4)
+        val matchedOriginGenders = matchedOrigins.map { it.gender }.distinct()
+        val showGenders = matchedOriginGenders.map { simplifyGender(it) }.filter { showGender(it) }.distinct()
+
+        showGenders.sortedBy { it.ordinal }
+
+        // Translate to native strings.
+        val showGendersPrint = showGenders.map { Origins.getLocaleOriginGender(context, it) }.toMutableList()
+        val showNamesPrint = showNames.map { Origins.getLocaleOriginName(context, it) }.toMutableList()
+
+        if (name.origins.size != showNames.size) {
+            showNamesPrint.add("...")
+        }
+
+        if (name.origins.map { it.gender }.distinct().size != showGenders.size) {
+            showGendersPrint.add("...")
+        }
+
+        return "$showGendersPrint $showNamesPrint"
+    }
+
     // check if a name matches
     fun isNameValid(name: BabyName?): Boolean {
         if (name == null) {
             return false
         }
 
-        val genderMatches = when (gender) {
-            GenderSelection.ALL -> true
-            GenderSelection.MALE -> name.isMale
-            GenderSelection.FEMALE -> name.isFemale
-            GenderSelection.NEUTRAL -> (name.isMale == name.isFemale)
-        }
-
-        if (!genderMatches) {
+        if (!name.origins.any { matchGender(genderSelection, it.gender) }) {
             return false
         }
 
-        if (origins.isNotEmpty()) {
-            if (originsLogic == OriginsLogic.OR) {
+        if (originsSelection.isNotEmpty()) {
+            if (originsSelectionLogic == OriginsLogic.OR) {
                 var originMatches = false
-                for (origin in name.origins) {
-                    if (origin in origins) {
+                for (originName in originsSelection) {
+                    if (name.origins.any { it -> it.name == originName && matchGender(genderSelection, it.gender) }) {
                         originMatches = true
-                        continue
+                        break
                     }
                 }
 
@@ -142,9 +205,9 @@ class BabyNameProject() : Serializable {
                 }
             }
 
-            if (originsLogic == OriginsLogic.AND) {
-                for (origin in origins) {
-                    if (origin !in name.origins) {
+            if (originsSelectionLogic == OriginsLogic.AND) {
+                for (origin in originsSelection) {
+                    if (!name.origins.any { it -> it.name == origin && matchGender(genderSelection, it.gender)}) {
                         return false
                     }
                 }
@@ -171,6 +234,24 @@ class BabyNameProject() : Serializable {
 
     companion object {
         const val DROP_RATE_PERCENT = 20
+
+        private fun matchGender(genderSelection: GenderSelection, gender: Gender): Boolean {
+            return when (genderSelection) {
+                GenderSelection.ALL -> true
+                GenderSelection.MALE -> when (gender) {
+                    Gender.MALE, Gender.MOSTLY_MALE, Gender.SOMEWHAT_MALE -> true
+                    else -> false
+                }
+                GenderSelection.FEMALE -> when (gender) {
+                    Gender.FEMALE, Gender.MOSTLY_FEMALE, Gender.SOMEWHAT_FEMALE -> true
+                    else -> false
+                }
+                GenderSelection.NEUTRAL -> when (gender) {
+                    Gender.UNISEX, Gender.SOMEWHAT_MALE, Gender.SOMEWHAT_FEMALE -> true
+                    else -> false
+                }
+            }
+        }
 
         fun readProject(filename: String?, context: Context): BabyNameProject? {
             var project: BabyNameProject? = null

@@ -12,7 +12,6 @@ import android.text.Spanned
 import android.text.style.BackgroundColorSpan
 import android.view.Menu
 import android.view.MenuItem
-import android.view.View
 import android.widget.Button
 import android.widget.EditText
 import android.widget.TextView
@@ -24,6 +23,8 @@ import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.snackbar.Snackbar
+import java.util.concurrent.locks.ReentrantLock
+import kotlin.concurrent.thread
 import fr.hnit.babyname.BabyNameProject.Companion.DROP_RATE_PERCENT
 
 class ScrollSearchActivity : AppCompatActivity() {
@@ -39,7 +40,7 @@ class ScrollSearchActivity : AppCompatActivity() {
     private var scores = HashMap<Int, Float>()
     private var needSaving = false
 
-    private var sortPattern = emptyList<String>()
+    private var sortPattern = ArrayList<String>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -73,7 +74,7 @@ class ScrollSearchActivity : AppCompatActivity() {
         scores = HashMap(project.scores)
         needSaving = project.needSaving
 
-        scrollAdapter = ScrollSearchAdapter(this, nexts, scores)
+        scrollAdapter = ScrollSearchAdapter(this, project, nexts, scores)
 
         recyclerView.adapter = scrollAdapter
 
@@ -84,9 +85,14 @@ class ScrollSearchActivity : AppCompatActivity() {
         }
 
         sortPatternTextView.doOnTextChanged { text, start, count, after ->
-            sortPattern = text.toString().split("\\s".toRegex())
+            // Split text into array list.
+            sortPattern = ArrayList(text.toString().split("\\s".toRegex()))
 
             sortNexts()
+        }
+
+        scrollAdapter.onItemClick = { babyName: BabyName ->
+            showNameDetails(babyName)
         }
 
         ItemTouchHelper(object : ItemTouchHelper.SimpleCallback(
@@ -212,86 +218,57 @@ class ScrollSearchActivity : AppCompatActivity() {
         }
     }
 
-    // for sorting
-    private fun getMatchPercent(value: String, patterns: List<String>): Int {
-        if (patterns.isEmpty()) {
-            return 0
-        } else {
-            val matches = getMatches(value, patterns)
-            return ((10000 * matches.fold(0){ acc, next -> acc + next.length }) / value.length) / 100
-        }
-    }
+    var nextsLock = ReentrantLock()
 
-    // for sorting
-    private fun getOriginScore(target: BabyName): Int {
-        var maxScore = 0
-        for (id in scores.keys) {
-            var score = 0
-            val source = MainActivity.database.get(id)
-            for (targetOrigin in target.origins) {
-                if (targetOrigin in source.origins) {
-                    score += ((scores.get(id) ?: 0f) * 2f).toInt()
-                }
-            }
-
-            if (score > maxScore) {
-                maxScore = score
-            }
-        }
-        return maxScore
-    }
-
-    // for sorting
-    private fun getSoundexScore(target: BabyName): Int {
-        var maxScore = 0
-        for (id in scores.keys) {
-            val source = MainActivity.database.get(id)
-            if (target.soundex == source.soundex) {
-                val score = ((scores.get(id) ?: 0f) * 2f).toInt()
-                if (score > maxScore) {
-                    maxScore = score
-                }
-            }
-        }
-        return maxScore
-    }
-
-    // Sort names by match length first, rating score second, soundex score third
+    // Sort names by match length first, rating score second, soundex score third.
     private fun sortNexts() {
-        nexts.sortWith { i: Int, j: Int ->
-            val a = MainActivity.database.get(i)
-            val b = MainActivity.database.get(j)
+        // Make a thread-exclusive copy
+        val sortPatternCopy = sortPattern.toMutableList()
+        val scoresCopy = HashMap(scores)
 
-            val aMatchLength = getMatchPercent(a.name, sortPattern)
-            val bMatchLength = getMatchPercent(b.name, sortPattern)
+        thread (start = true) {
+            nextsLock.lock()
+            try {
+                nexts.sortWith { i: Int, j: Int ->
+                    val a = MainActivity.database.get(i)
+                    val b = MainActivity.database.get(j)
 
-            if (aMatchLength != bMatchLength) {
-                return@sortWith (bMatchLength - aMatchLength)
-            } else {
-                val aScore = ((scores.get(a.id) ?: 0f) * 2f).toInt()
-                val bScore = ((scores.get(b.id) ?: 0f) * 2f).toInt()
+                    val aMatchLength = getMatchPercent(a.name, sortPatternCopy)
+                    val bMatchLength = getMatchPercent(b.name, sortPatternCopy)
 
-                if (aScore != bScore) {
-                    return@sortWith (bScore - aScore)
-                } else {
-                    val aSoundexScore = getSoundexScore(a)
-                    val bSoundexScore = getSoundexScore(b)
-
-                    if (aSoundexScore != bSoundexScore) {
-                        return@sortWith bSoundexScore - aSoundexScore
+                    if (aMatchLength != bMatchLength) {
+                        return@sortWith (bMatchLength - aMatchLength)
                     } else {
-                        val aOriginScore = getOriginScore(a)
-                        val bOriginScore = getOriginScore(b)
-                        return@sortWith (bOriginScore - aOriginScore)
+                        val aScore = ((scoresCopy[a.id] ?: 0f) * 2f).toInt()
+                        val bScore = ((scoresCopy[b.id] ?: 0f) * 2f).toInt()
+
+                        if (aScore != bScore) {
+                            return@sortWith (bScore - aScore)
+                        } else {
+                            val aSoundexScore = getSoundexScore(scoresCopy, a)
+                            val bSoundexScore = getSoundexScore(scoresCopy,b)
+
+                            if (aSoundexScore != bSoundexScore) {
+                                return@sortWith bSoundexScore - aSoundexScore
+                            } else {
+                                val aOriginScore = getOriginScore(scoresCopy, a)
+                                val bOriginScore = getOriginScore(scoresCopy, b)
+                                return@sortWith (bOriginScore - aOriginScore)
+                            }
+                        }
                     }
                 }
+
+                runOnUiThread {
+                    updateCounter()
+
+                    scrollAdapter.notifyDataSetChanged()
+                    recyclerView.scrollToPosition(0)
+                }
+            } finally {
+                nextsLock.unlock()
             }
         }
-
-        updateCounter()
-
-        scrollAdapter.notifyDataSetChanged()
-        recyclerView.scrollToPosition(0)
     }
 
     private fun updateCounter() {
@@ -331,6 +308,18 @@ class ScrollSearchActivity : AppCompatActivity() {
         }
 
         super.onStop()
+    }
+
+    fun showNameDetails(name: BabyName) {
+        builder
+            .setTitle(name.name)
+            .setMessage(project.getLongOriginsString(applicationContext, name))
+            .setPositiveButton(R.string.ok) { dialog, id ->
+                dialog.dismiss()
+            }
+
+        val dialog = builder.create()
+        dialog.show()
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
@@ -379,6 +368,50 @@ class ScrollSearchActivity : AppCompatActivity() {
     companion object {
         data class Match(val begin: Int, val length: Int)
 
+        // for sorting
+        private fun getMatchPercent(value: String, patterns: List<String>): Int {
+            if (patterns.isEmpty()) {
+                return 0
+            } else {
+                val matches = getMatches(value, patterns)
+                return ((10000 * matches.fold(0){ acc, next -> acc + next.length }) / value.length) / 100
+            }
+        }
+
+        // for sorting
+        private fun getOriginScore(scores: HashMap<Int, Float>, target: BabyName): Int {
+            var maxScore = 0
+            for (id in scores.keys) {
+                var score = 0
+                val source = MainActivity.database.get(id)
+                for (targetOrigin in target.origins) {
+                    if (targetOrigin in source.origins) {
+                        score += ((scores.get(id) ?: 0f) * 2f).toInt()
+                    }
+                }
+
+                if (score > maxScore) {
+                    maxScore = score
+                }
+            }
+            return maxScore
+        }
+
+        // for sorting
+        private fun getSoundexScore(scores: HashMap<Int, Float>, target: BabyName): Int {
+            var maxScore = 0
+            for (id in scores.keys) {
+                val source = MainActivity.database.get(id)
+                if (target.soundex == source.soundex) {
+                    val score = ((scores.get(id) ?: 0f) * 2f).toInt()
+                    if (score > maxScore) {
+                        maxScore = score
+                    }
+                }
+            }
+            return maxScore
+        }
+
         private fun isMatch(value: String, patterns: List<String>): Boolean {
             for (p in patterns) {
                 if (value.indexOf(p) == -1) {
@@ -390,6 +423,13 @@ class ScrollSearchActivity : AppCompatActivity() {
 
         // return array of matching ranges as array of begin,length pairs
         private fun getMatches(value: String, patterns: List<String>): List<Match> {
+            val caseSensitive = patterns.any { it.isNotEmpty() && it[0].isUpperCase() }
+            val value = if (caseSensitive) {
+                value
+            } else {
+                value.lowercase()
+            }
+
             // find matching ranges
             val matches = mutableListOf<Match>()
             for (p in patterns) {

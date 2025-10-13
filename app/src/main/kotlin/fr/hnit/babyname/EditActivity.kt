@@ -75,7 +75,7 @@ class EditActivity : AppCompatActivity() {
             }
         }
 
-        val allOrigins = MainActivity.database.getAllOrigins()
+        val allOrigins = MainActivity.database.getAllOriginNames()
         val origins = ArrayList(allOrigins)
         origins.sort()
 
@@ -136,7 +136,7 @@ class EditActivity : AppCompatActivity() {
         existingNexts = project.nexts
         existingScores = project.scores
 
-        val genderSelection = when (project.gender) {
+        val genderSelection = when (project.genderSelection) {
             BabyNameProject.GenderSelection.ALL -> R.id.gender_all_radio
             BabyNameProject.GenderSelection.MALE -> R.id.gender_male_radio
             BabyNameProject.GenderSelection.FEMALE -> R.id.gender_female_radio
@@ -144,7 +144,7 @@ class EditActivity : AppCompatActivity() {
         }
         genderRadio.check(genderSelection)
 
-        val originsLogicSelection = when (project.originsLogic) {
+        val originsLogicSelection = when (project.originsSelectionLogic) {
             BabyNameProject.OriginsLogic.AND -> R.id.origins_logic_and
             BabyNameProject.OriginsLogic.OR -> R.id.origins_logic_or
         }
@@ -159,7 +159,7 @@ class EditActivity : AppCompatActivity() {
         }
 
         // select project origins
-        for (origin in project.origins) {
+        for (origin in project.originsSelection) {
             val i = adapter.getPosition(origin)
             if (i > -1) {
                 adapter.checked[i] = true
@@ -171,19 +171,19 @@ class EditActivity : AppCompatActivity() {
 
     fun storeToProject(project: BabyNameProject): Boolean {
         // update origins
-        project.origins.clear()
+        project.originsSelection.clear()
         var i = 0
         while (i < adapter.origins.size) {
             val origin = adapter.origins[i]
             val checked = adapter.checked[i]
             if (checked && origin != null) {
-                project.origins.add(origin)
+                project.originsSelection.add(origin)
             }
             i += 1
         }
 
         // update gender selection
-        project.gender = when (genderRadio.checkedRadioButtonId) {
+        project.genderSelection = when (genderRadio.checkedRadioButtonId) {
             R.id.gender_male_radio -> BabyNameProject.GenderSelection.MALE
             R.id.gender_female_radio -> BabyNameProject.GenderSelection.FEMALE
             R.id.gender_all_radio -> BabyNameProject.GenderSelection.ALL
@@ -195,7 +195,7 @@ class EditActivity : AppCompatActivity() {
         }
 
         // update origins logic
-        project.originsLogic = when (originsLogicRadio.checkedRadioButtonId) {
+        project.originsSelectionLogic = when (originsLogicRadio.checkedRadioButtonId) {
             R.id.origins_logic_and -> BabyNameProject.OriginsLogic.AND
             R.id.origins_logic_or -> BabyNameProject.OriginsLogic.OR
             else -> {
