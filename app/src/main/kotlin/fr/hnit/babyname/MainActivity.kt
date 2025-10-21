@@ -53,7 +53,15 @@ class MainActivity : UpdateViewListener, AppCompatActivity() {
                 }
 
                 if (!database.isLoaded) {
-                    database.initialize(this)
+                    try {
+                        database.initialize(this)
+                    } catch (e: Exception) {
+                        runOnUiThread {
+                            Toast.makeText(applicationContext, e.message, Toast.LENGTH_LONG).show()
+                        }
+                        // continue with crash
+                        throw e
+                    }
                 }
 
                 if (!projects_isLoaded) {
