@@ -229,6 +229,11 @@ class ScrollSearchActivity : AppCompatActivity() {
         thread (start = true) {
             nextsLock.lock()
             try {
+                if (sortPatternCopy != sortPattern || scoresCopy != scores) {
+                    // Sort parameters have changed => abort.
+                    return@thread
+                }
+
                 nexts.sortWith { i: Int, j: Int ->
                     val a = MainActivity.database.get(i)
                     val b = MainActivity.database.get(j)
