@@ -16,7 +16,7 @@
     <string name="button_drop_20_percent">Drop 20%</string>
     <string name="button_drop_percent">Drop last %d%%</string>
     <string name="button_export">Export</string>
-    <string name="button_import_merge">Import\n&amp;\nMerge</string>
+    <string name="button_import_add">Import\n&amp;\nAdd</string>
     <string name="button_import_replace">Import\n&amp;\nReplace</string>
     <string name="button_sort">Sort</string>
     <string name="copy">Copy</string>

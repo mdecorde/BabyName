@@ -18,7 +18,7 @@ import kotlin.concurrent.thread
 
 class DatabaseActivity : AppCompatActivity() {
     private lateinit var builder: AlertDialog.Builder
-    private lateinit var importMergeButton: Button
+    private lateinit var importAddButton: Button
     private lateinit var importReplaceButton: Button
     private lateinit var exportButton: Button
 
@@ -35,15 +35,15 @@ class DatabaseActivity : AppCompatActivity() {
 
         builder = AlertDialog.Builder(this)
 
-        importMergeButton = findViewById(R.id.ImportMergeButton)
+        importAddButton = findViewById(R.id.ImportAddButton)
         importReplaceButton = findViewById(R.id.ImportReplaceButton)
         exportButton = findViewById(R.id.ExportButton)
 
-        importMergeButton.setOnClickListener { v: View? ->
+        importAddButton.setOnClickListener { v: View? ->
             val intent = Intent(Intent.ACTION_GET_CONTENT)
             intent.addCategory(Intent.CATEGORY_OPENABLE)
             intent.type = "text/*"
-            importMergeFileLauncher.launch(intent)
+            importAddFileLauncher.launch(intent)
         }
 
         importReplaceButton.setOnClickListener { v: View? ->
@@ -63,7 +63,7 @@ class DatabaseActivity : AppCompatActivity() {
         }
     }
 
-    private var importMergeFileLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+    private var importAddFileLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
         if (result.resultCode == RESULT_OK) {
             val intent = result.data ?: return@registerForActivityResult
             val uri = intent.data ?: return@registerForActivityResult
@@ -150,20 +150,20 @@ class DatabaseActivity : AppCompatActivity() {
     }
 
     private fun enableButtons(enable: Boolean) {
-        for (button in listOf(importMergeButton, importReplaceButton, exportButton)) {
+        for (button in listOf(importAddButton, importReplaceButton, exportButton)) {
             button.alpha = if (enable) { 1.0f } else { .5f }
             button.isClickable = enable
         }
     }
 
-    private fun importDatabase(uri: Uri, doMerge: Boolean) {
+    private fun importDatabase(uri: Uri, doAdd: Boolean) {
         thread(start = true) {
             try {
                 val byteData = readFile(this, uri)
                 val stringData = String(byteData, 0, byteData.size)
                 val oldCount = MainActivity.database.size()
                 val names = MainActivity.database.importCSV(stringData)
-                if (doMerge) {
+                if (doAdd) {
                     MainActivity.database.addNames(names)
                     val newCount = MainActivity.database.size()
                     runOnUiThread {

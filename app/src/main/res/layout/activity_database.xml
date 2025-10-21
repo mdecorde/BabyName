@@ -23,14 +23,14 @@
             android:text="@string/button_export" />
 
         <Button
-            android:id="@+id/ImportMergeButton"
+            android:id="@+id/ImportAddButton"
             android:layout_width="160dp"
             android:layout_height="wrap_content"
             android:layout_margin="14dp"
             android:backgroundTint="@color/colorPrimary"
             android:textSize="20sp"
             android:layout_weight="1"
-            android:text="@string/button_import_merge" />
+            android:text="@string/button_import_add" />
 
         <Button
             android:id="@+id/ImportReplaceButton"
