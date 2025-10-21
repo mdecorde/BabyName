@@ -1,0 +1,5 @@
+* add new database with +40000 entries
+* show name details
+  * finer gender distinction
+  * show rarity
+* fix crash in scroll view with slow filter
