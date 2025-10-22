@@ -3,3 +3,4 @@
   * finer gender distinction
   * show rarity
 * fix crash in scroll view with slow filter
+* allow to reset and also store the database
