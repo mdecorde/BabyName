@@ -173,7 +173,7 @@ class BabyNameProject() : Serializable {
         val showGendersPrint = showGenders.map { Origins.getLocaleOriginGender(context, it) }.toMutableList()
         val showNamesPrint = showNames.map { Origins.getLocaleOriginName(context, it) }.toMutableList()
 
-        if (name.origins.size != showNames.size) {
+        if (name.origins.map { it.name }.distinct().size != showNames.size) {
             showNamesPrint.add("...")
         }
 
