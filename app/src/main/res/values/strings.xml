@@ -1,5 +1,5 @@
 <resources>
-    <string name="about">Baby Name %s\n\nThis application allows you to find your favorite baby name from a collection of >40000 names from ftp://ftp.heise.de/pub/ct/listings/0717-182.zip. Licensed as GFDL-1.2-or-later.\n\nThis application is entirely Open-Source. Any suggestion, help or question is welcome. Please go to https://github.com/mdecorde/BabyName. The Baby Name app is maintained by Moritz Warning.</string>
+    <string name="about">Baby Name %s\n\nThis application allows you to find your favorite baby name from a collection of >40000 names.\n\nThis application is entirely Open-Source (GPL-3.0-or-later). Any suggestion, help or question is welcome. Visit https://github.com/mdecorde/BabyName for more information.\n\nDatabase under Copyright 2007-2008 by Jörg MICHAEL, GFDL-1.2-or-later.</string>
     <string name="about_button">About</string>
     <string name="action_delete_baby">Delete</string>
     <string name="action_dig_baby">Find name...</string>
