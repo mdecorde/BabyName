@@ -178,7 +178,7 @@ class DatabaseActivity : AppCompatActivity() {
                 MainActivity.database.addNames(names)
                 val newCount = MainActivity.database.size()
                 runOnUiThread {
-                    Toast.makeText(this, "Added ${newCount - oldCount} new names. $newCount total.", Toast.LENGTH_LONG).show()
+                    Toast.makeText(this, "Added ${newCount - oldCount} names. $newCount total.", Toast.LENGTH_LONG).show()
                 }
             } else {
                 MainActivity.database.setNames(names)
