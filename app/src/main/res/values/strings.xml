@@ -1,5 +1,5 @@
 <resources>
-    <string name="about">Baby Name %s\n\nThis application allows you to find your favorite baby name from a collection of >40000 names.\n\nThis application is entirely Open-Source (GPL-3.0-or-later). Any suggestion, help or question is welcome. Visit https://github.com/mdecorde/BabyName for more information.\n\nDatabase under Copyright 2007-2008 by Jörg MICHAEL, GFDL-1.2-or-later.</string>
+    <string name="about_app">Baby Name %s\n\nThis application allows you to find your favorite baby name from a collection of >40000 names.\n\nThis application is entirely Open-Source (GPL-3.0-or-later). Any suggestion, help or question is welcome. Visit https://github.com/mdecorde/BabyName for more information.\n\nDatabase under Copyright 2007-2008 by Jörg MICHAEL, GFDL-1.2-or-later.</string>
     <string name="about_button">About</string>
     <string name="action_delete_baby">Delete</string>
     <string name="action_dig_baby">Find name...</string>
@@ -42,18 +42,26 @@
     <string name="gender_all">All</string>
     <string name="gender_neutral">Neutral</string>
     <string name="gender_female">Female</string>
+    <string name="gender_female_description">Female first name.</string>
     <string name="gender_male">Male</string>
+    <string name="gender_male_description">Male first name.</string>
     <string name="gender_unisex">Unisex</string>
+    <string name="gender_unisex_description">Can be male or female.</string>
     <string name="gender_mostly_male">Mostly Male</string>
+    <string name="gender_mostly_male_description">Male name, if first part of name; else: mostly male name.</string>
     <string name="gender_mostly_female">Mostly Female</string>
+    <string name="gender_mostly_female_description">Female name, if first part of name; else: mostly female name.</string>
     <string name="gender_somewhat_male">Somewhat Male</string>
+    <string name="gender_somewhat_male_description">Unisex name, which is mostly male.</string>
     <string name="gender_somewhat_female">Somewhat Female</string>
+    <string name="gender_somewhat_female_description">Unisex name, which is mostly female.</string>
     <string name="genre">Gender:</string>
     <string name="girl">Girl</string>
     <string name="girl_name">A girl whose</string>
     <string name="go">Go</string>
     <string name="home_text">Baby name projects \n(click \'new\' to start a project)</string>
     <string name="keep_existing_names">Keep %d existing names:</string>
+    <string name="legend">Legend</string>
     <string name="menu_abort">Abort</string>
     <string name="menu_about">About</string>
     <string name="menu_database">Database</string>

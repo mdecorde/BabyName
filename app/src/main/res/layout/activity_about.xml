@@ -1,18 +1,98 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:orientation="vertical"
     tools:context=".AboutActivity">
 
     <TextView
         android:layout_width="wrap_content"
-        android:layout_height="match_parent"
+        android:layout_height="wrap_content"
         android:layout_margin="@dimen/activity_vertical_margin"
         android:textAppearance="?android:attr/textAppearanceSmall"
-        android:text="@string/about"
-        android:id="@+id/about_text"
-        android:height="200dp"
+        android:text="@string/about_app"
+        android:id="@+id/about_app_text"
+        android:layout_weight="1"
         android:autoLink="web" />
 
-</RelativeLayout>
+    <TableLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_weight="0.1"
+        android:layout_margin="@dimen/activity_vertical_margin">
+
+        <TableRow>
+            <TextView
+                android:text="@string/legend"
+                android:textStyle="bold"
+                android:gravity="center"
+                android:layout_weight="1" />
+        </TableRow>
+
+        <TableRow>
+            <TextView
+                android:text="@string/gender_male"
+                android:layout_marginEnd="10dp" />
+            <TextView
+                android:layout_weight="1"
+                android:text="@string/gender_male_description" />
+        </TableRow>
+
+        <TableRow>
+            <TextView
+                android:text="@string/gender_female"
+                android:layout_marginEnd="10dp" />
+            <TextView
+                android:layout_weight="1"
+                android:text="@string/gender_female_description" />
+        </TableRow>
+
+        <TableRow>
+            <TextView
+                android:text="@string/gender_mostly_male"
+                android:layout_marginEnd="10dp" />
+            <TextView
+                android:layout_weight="1"
+                android:text="@string/gender_mostly_male_description" />
+        </TableRow>
+
+        <TableRow>
+            <TextView
+                android:text="@string/gender_mostly_female"
+                android:layout_marginEnd="10dp" />
+            <TextView
+                android:layout_weight="1"
+                android:text="@string/gender_mostly_female_description" />
+        </TableRow>
+
+        <TableRow>
+            <TextView
+                android:text="@string/gender_somewhat_male"
+                android:layout_marginEnd="10dp" />
+            <TextView
+                android:layout_weight="1"
+                android:text="@string/gender_somewhat_male_description" />
+        </TableRow>
+
+        <TableRow>
+            <TextView
+                android:text="@string/gender_somewhat_female"
+                android:layout_marginEnd="10dp" />
+            <TextView
+                android:layout_weight="1"
+                android:text="@string/gender_somewhat_female_description" />
+        </TableRow>
+
+        <TableRow>
+            <TextView
+                android:text="@string/gender_unisex"
+                android:layout_marginEnd="10dp" />
+            <TextView
+                android:layout_weight="1"
+                android:text="@string/gender_unisex_description" />
+        </TableRow>
+
+    </TableLayout>
+
+</LinearLayout>

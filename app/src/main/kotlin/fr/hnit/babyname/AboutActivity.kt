@@ -14,7 +14,7 @@ class AboutActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_about)
 
-        val v = findViewById<TextView>(R.id.about_text)
-        v.text = String.format(getString(R.string.about), BuildConfig.VERSION_NAME)
-    }
+        val aboutAppTextView = findViewById<TextView>(R.id.about_app_text)
+        aboutAppTextView.text = String.format(getString(R.string.about_app), BuildConfig.VERSION_NAME)
+     }
 }
