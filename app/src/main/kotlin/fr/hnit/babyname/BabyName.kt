@@ -30,13 +30,13 @@ class BabyName(var id: Int, var name: String, var origins: Array<Origin>, val he
     data class Origin(val name: String, val gender: Gender, val rarity: OriginRarity?)
 
     enum class Gender {
-        MALE, // male first name
-        FEMALE, // female first name
-        SOMEWHAT_MALE, // male name, if first part of name; else: mostly male name
-        SOMEWHAT_FEMALE, // female name, if first part of name; else: mostly female name
-        MOSTLY_MALE, // unisex name, which is mostly male
-        MOSTLY_FEMALE, // unisex name, which is mostly female
-        UNISEX // can be male or female
+        MALE, // M: male first name
+        FEMALE, // F: female first name
+        SOMEWHAT_MALE, // "?M": unisex name, which is mostly male
+        SOMEWHAT_FEMALE, // "?F": unisex name, which is mostly female
+        MOSTLY_MALE, // "1M": male name, if first part of name; else: mostly male name
+        MOSTLY_FEMALE, // "1F": female name, if first part of name; else: mostly female name
+        UNISEX // "?": can be male or female
     }
 
     companion object {
