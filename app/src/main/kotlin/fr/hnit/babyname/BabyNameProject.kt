@@ -76,22 +76,22 @@ class BabyNameProject() : Serializable {
     }
 
     // fix name ids when the database changes
-    fun updateIDs(map: HashMap<Int, Int>) {
+    fun updateIDs(changeMap: HashMap<Int, Int>) {
         val newNexts = ArrayList<Int>()
         for (next in nexts) {
-            val newIndex = map.get(next)
+            val newIndex = changeMap.get(next)
             if (newIndex != null) {
-                // invalidate
-                nextsIndex = -1
-
                 if (newIndex >= 0) {
                     // new index
                     newNexts.add(newIndex)
                 } else {
                     // name deleted
                 }
+
+                // invalidate
+                nextsIndex = -1
             } else {
-                // index not changes
+                // no change
                 newNexts.add(next)
             }
         }
@@ -99,7 +99,7 @@ class BabyNameProject() : Serializable {
 
         val newScores = hashMapOf<Int, Float>()
         for ((id, score) in scores) {
-            val newIndex = map.get(id)
+            val newIndex = changeMap.get(id)
             if (newIndex != null) {
                 if (newIndex >= 0) {
                     // new index

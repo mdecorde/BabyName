@@ -5,10 +5,8 @@
 
 package fr.hnit.babyname
 
-import android.app.Activity
 import android.content.Context
 import java.io.BufferedReader
-import java.io.IOException
 import java.io.InputStreamReader
 
 import fr.hnit.babyname.BabyName.Origin
@@ -79,20 +77,24 @@ class BabyNameDatabase {
         // sort for binary search
         newNames.sortBy { it.name }
 
+        // fix all indices
+        for (id in newNames.indices) {
+            newNames[id].id = id
+        }
+
         // record id changes
         val map = HashMap<Int, Int>()
 
         for (oldIndex in allNames.indices) {
             val oldName = allNames[oldIndex]
             val newIndex = newNames.binarySearchBy(oldName.name) { it.name }
-            if (oldIndex != newIndex) {
+            if (newIndex < 0) {
+                // name does not exist anymore
+                map[oldIndex] = -1
+            } else {
+                // index changed
                 map[oldIndex] = newIndex
             }
-        }
-
-        // fix all indices
-        for (id in newNames.indices) {
-            newNames[id].id = id
         }
 
         // update projects
