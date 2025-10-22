@@ -7,7 +7,6 @@ import java.io.File
 import java.io.FileInputStream
 import java.io.FileOutputStream
 import java.io.IOException
-import java.nio.charset.Charset
 
 class BabyNameSettings() {
 	var isLoaded = false
@@ -22,7 +21,7 @@ class BabyNameSettings() {
         try {
             val stringData = readInternalFile(ctx, SETTINGS_FILE)
             val obj = JSONObject(
-                String(stringData, Charset.forName("UTF-8"))
+                String(stringData, Charsets.UTF_8)
             )
             nextOnRating = obj.optBoolean("next_on_rating", nextOnRating)
             version = obj.optString("version", version)

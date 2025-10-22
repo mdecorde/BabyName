@@ -17,7 +17,6 @@ import fr.hnit.babyname.BabyName.Gender
 import fr.hnit.babyname.BabyNameSettings.Companion.fileExists
 import fr.hnit.babyname.BabyNameSettings.Companion.readInternalFile
 import fr.hnit.babyname.BabyNameSettings.Companion.writeInternalFile
-import java.nio.charset.Charset
 
 class BabyNameDatabase {
     public var isLoaded = false
@@ -45,7 +44,7 @@ class BabyNameDatabase {
 
     fun loadDatabase(ctx: Context) {
         val csv = readInternalFile(ctx, DATABASE_PATH)
-        val names = deserializeNames(String(csv, Charset.forName("UTF-8")))
+        val names = deserializeNames(String(csv, Charsets.UTF_8))
         //Log.d(this, "Loaded ${allNames.size} names")
         setNames(names)
     }
