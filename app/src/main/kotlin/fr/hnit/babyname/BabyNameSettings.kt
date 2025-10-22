@@ -9,7 +9,7 @@ import java.io.FileOutputStream
 import java.io.IOException
 
 class BabyNameSettings() {
-	var isLoaded = false
+    var isLoaded = false
     var version = BuildConfig.VERSION_NAME
     var nextOnRating = false
 
