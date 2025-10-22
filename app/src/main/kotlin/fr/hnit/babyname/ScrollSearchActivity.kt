@@ -235,8 +235,8 @@ class ScrollSearchActivity : AppCompatActivity() {
                 }
 
                 nexts.sortWith { i: Int, j: Int ->
-                    val a = MainActivity.database.get(i)
-                    val b = MainActivity.database.get(j)
+                    val a = MainActivity.database.getName(i)
+                    val b = MainActivity.database.getName(j)
 
                     val aMatchLength = getMatchPercent(a.name, sortPatternCopy)
                     val bMatchLength = getMatchPercent(b.name, sortPatternCopy)
@@ -282,7 +282,7 @@ class ScrollSearchActivity : AppCompatActivity() {
         } else {
             var counter = 0
             for (next in nexts) {
-                val item = MainActivity.database.get(next)
+                val item = MainActivity.database.getName(next)
                 if (isMatch(item.name, sortPattern)) {
                     counter += 1
                 }
@@ -388,7 +388,7 @@ class ScrollSearchActivity : AppCompatActivity() {
             var maxScore = 0
             for (id in scores.keys) {
                 var score = 0
-                val source = MainActivity.database.get(id)
+                val source = MainActivity.database.getName(id)
                 for (targetOrigin in target.origins) {
                     if (targetOrigin in source.origins) {
                         score += ((scores.get(id) ?: 0f) * 2f).toInt()
@@ -406,7 +406,7 @@ class ScrollSearchActivity : AppCompatActivity() {
         private fun getSoundexScore(scores: HashMap<Int, Float>, target: BabyName): Int {
             var maxScore = 0
             for (id in scores.keys) {
-                val source = MainActivity.database.get(id)
+                val source = MainActivity.database.getName(id)
                 if (target.soundex == source.soundex) {
                     val score = ((scores.get(id) ?: 0f) * 2f).toInt()
                     if (score > maxScore) {

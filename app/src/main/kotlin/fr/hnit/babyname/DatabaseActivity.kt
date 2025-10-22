@@ -18,9 +18,10 @@ import kotlin.concurrent.thread
 
 class DatabaseActivity : AppCompatActivity() {
     private lateinit var builder: AlertDialog.Builder
-    private lateinit var importAddButton: Button
-    private lateinit var importReplaceButton: Button
+    private lateinit var addButton: Button
+    private lateinit var replaceButton: Button
     private lateinit var exportButton: Button
+    private lateinit var resetButton: Button
 
     private fun showErrorMessage(title: String, message: String) {
         builder.setTitle(title)
@@ -33,24 +34,25 @@ class DatabaseActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_database)
 
-        builder = AlertDialog.Builder(this)
+        builder = AlertDialog.Builder(this, R.style.AlertDialogTheme)
 
-        importAddButton = findViewById(R.id.ImportAddButton)
-        importReplaceButton = findViewById(R.id.ImportReplaceButton)
+        addButton = findViewById(R.id.AddButton)
+        replaceButton = findViewById(R.id.ReplaceButton)
         exportButton = findViewById(R.id.ExportButton)
+        resetButton = findViewById(R.id.ResetButton)
 
-        importAddButton.setOnClickListener { v: View? ->
+        addButton.setOnClickListener { v: View? ->
             val intent = Intent(Intent.ACTION_GET_CONTENT)
             intent.addCategory(Intent.CATEGORY_OPENABLE)
             intent.type = "text/*"
-            importAddFileLauncher.launch(intent)
+            addFileLauncher.launch(intent)
         }
 
-        importReplaceButton.setOnClickListener { v: View? ->
+        replaceButton.setOnClickListener { v: View? ->
             val intent = Intent(Intent.ACTION_GET_CONTENT)
             intent.addCategory(Intent.CATEGORY_OPENABLE)
             intent.type = "text/*"
-            importReplaceFileLauncher.launch(intent)
+            replaceFileLauncher.launch(intent)
         }
 
         exportButton.setOnClickListener {
@@ -61,9 +63,23 @@ class DatabaseActivity : AppCompatActivity() {
             intent.type = "text/*"
             exportFileLauncher.launch(intent)
         }
+
+        resetButton.setOnClickListener {
+            builder
+                .setTitle("Reset")
+                .setMessage("Really reset Database?")
+                .setPositiveButton(R.string.button_reset) { dialog, id ->
+                    resetDatabase()
+                }.setNegativeButton(R.string.button_abort) { dialog, id ->
+                    dialog.dismiss()
+                }
+
+            val dialog = builder.create()
+            dialog.show()
+        }
     }
 
-    private var importAddFileLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+    private var addFileLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
         if (result.resultCode == RESULT_OK) {
             val intent = result.data ?: return@registerForActivityResult
             val uri = intent.data ?: return@registerForActivityResult
@@ -77,7 +93,7 @@ class DatabaseActivity : AppCompatActivity() {
         }
     }
 
-    private var importReplaceFileLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+    private var replaceFileLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
         if (result.resultCode == RESULT_OK) {
             val intent = result.data ?: return@registerForActivityResult
             val uri = intent.data ?: return@registerForActivityResult
@@ -99,7 +115,24 @@ class DatabaseActivity : AppCompatActivity() {
             enableButtons(false)
 
             thread(start = true) {
-                exportDatabase(applicationContext, uri)
+                try {
+                    val names = MainActivity.database.getAll()
+                    val csv = BabyNameDatabase.serializeNames(names)
+                    val count = MainActivity.database.size()
+
+                    val fos = contentResolver.openOutputStream(uri)
+                    fos!!.write(csv.toByteArray())
+                    fos.close()
+
+                    runOnUiThread {
+                        Toast.makeText(this, "Exported $count entries.", Toast.LENGTH_LONG).show()
+                    }
+                } catch (e: Exception) {
+                    runOnUiThread {
+                        showErrorMessage("Error", e.toString())
+                    }
+                }
+
                 runOnUiThread {
                     enableButtons(true)
                 }
@@ -107,80 +140,80 @@ class DatabaseActivity : AppCompatActivity() {
         }
     }
 
-    private fun exportDatabase(ctx: Context, uri: Uri) {
+    private fun resetDatabase() {
+        enableButtons(false)
+
         thread(start = true) {
             try {
-                val csv = MainActivity.database.exportCSV()
-                val count = MainActivity.database.size()
-
-                val fos = ctx.contentResolver.openOutputStream(uri)
-                fos!!.write(csv.toByteArray())
-                fos.close()
-
+                MainActivity.database.resetDatabase(applicationContext)
                 runOnUiThread {
-                    Toast.makeText(this, "Exported $count entries.", Toast.LENGTH_LONG).show()
+                    Toast.makeText(this, "Database reset done.", Toast.LENGTH_LONG).show()
                 }
             } catch (e: Exception) {
                 runOnUiThread {
                     showErrorMessage("Error", e.toString())
                 }
             }
-        }
-    }
 
-    private fun getFileSize(ctx: Context, uri: Uri?): Long {
-        val cursor = ctx.contentResolver.query(uri!!, null, null, null, null)
-        cursor!!.moveToFirst()
-        val size = cursor.getLong(cursor.getColumnIndex(OpenableColumns.SIZE).coerceAtLeast(0))
-        cursor.close()
-        return size
-    }
-
-    private fun readFile(ctx: Context, uri: Uri): ByteArray {
-        val size = getFileSize(ctx, uri).toInt()
-        val iStream = ctx.contentResolver.openInputStream(uri)
-        val buffer = ByteArrayOutputStream()
-        var nRead: Int
-        val data = ByteArray(size)
-        while (iStream!!.read(data, 0, data.size).also { nRead = it } != -1) {
-            buffer.write(data, 0, nRead)
+            runOnUiThread {
+                enableButtons(true)
+            }
         }
-        iStream.close()
-        return data
     }
 
     private fun enableButtons(enable: Boolean) {
-        for (button in listOf(importAddButton, importReplaceButton, exportButton)) {
+        for (button in listOf(addButton, replaceButton, exportButton, resetButton)) {
             button.alpha = if (enable) { 1.0f } else { .5f }
             button.isClickable = enable
         }
     }
 
     private fun importDatabase(uri: Uri, doAdd: Boolean) {
-        thread(start = true) {
-            try {
-                val byteData = readFile(this, uri)
-                val stringData = String(byteData, 0, byteData.size)
-                val oldCount = MainActivity.database.size()
-                val names = MainActivity.database.importCSV(stringData)
-                if (doAdd) {
-                    MainActivity.database.addNames(names)
-                    val newCount = MainActivity.database.size()
-                    runOnUiThread {
-                        Toast.makeText(this, "Added ${newCount - oldCount} new names. $newCount total.", Toast.LENGTH_LONG).show()
-                    }
-                } else {
-                    MainActivity.database.setNames(names)
-                    val newCount = MainActivity.database.size()
-                    runOnUiThread {
-                        Toast.makeText(this, "Replaced database with $newCount names.", Toast.LENGTH_LONG).show()
-                    }
-                }
-            } catch (e: Exception) {
+        try {
+            val byteData = readFile(this, uri)
+            val stringData = String(byteData, 0, byteData.size)
+            val oldCount = MainActivity.database.size()
+            val names = BabyNameDatabase.deserializeNames(stringData)
+            if (doAdd) {
+                MainActivity.database.addNames(names)
+                val newCount = MainActivity.database.size()
                 runOnUiThread {
-                    showErrorMessage("Error", e.toString())
+                    Toast.makeText(this, "Added ${newCount - oldCount} new names. $newCount total.", Toast.LENGTH_LONG).show()
+                }
+            } else {
+                MainActivity.database.setNames(names)
+                val newCount = MainActivity.database.size()
+                runOnUiThread {
+                    Toast.makeText(this, "Replaced database with $newCount names.", Toast.LENGTH_LONG).show()
                 }
             }
+        } catch (e: Exception) {
+            runOnUiThread {
+                showErrorMessage("Error", e.toString())
+            }
+        }
+    }
+
+    companion object {
+        private fun getFileSize(ctx: Context, uri: Uri?): Long {
+            val cursor = ctx.contentResolver.query(uri!!, null, null, null, null)
+            cursor!!.moveToFirst()
+            val size = cursor.getLong(cursor.getColumnIndex(OpenableColumns.SIZE).coerceAtLeast(0))
+            cursor.close()
+            return size
+        }
+
+        private fun readFile(ctx: Context, uri: Uri): ByteArray {
+            val size = getFileSize(ctx, uri).toInt()
+            val iStream = ctx.contentResolver.openInputStream(uri)
+            val buffer = ByteArrayOutputStream()
+            var nRead: Int
+            val data = ByteArray(size)
+            while (iStream!!.read(data, 0, data.size).also { nRead = it } != -1) {
+                buffer.write(data, 0, nRead)
+            }
+            iStream.close()
+            return data
         }
     }
 }

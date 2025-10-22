@@ -211,7 +211,7 @@ open class FlipSearchActivity : AppCompatActivity() {
 
     private fun getCurrentName(): BabyName? {
         if (nextsIndex >= 0 && nextsIndex < nexts.size) {
-            return MainActivity.database.get(nexts[nextsIndex])
+            return MainActivity.database.getName(nexts[nextsIndex])
         } else {
             return null
         }
@@ -220,7 +220,7 @@ open class FlipSearchActivity : AppCompatActivity() {
     private fun getPreviousName(): BabyName? {
         if (nextsIndex > 0 && nextsIndex <= nexts.size) {
             nextsIndex -= 1
-            return MainActivity.database.get(nexts[nextsIndex])
+            return MainActivity.database.getName(nexts[nextsIndex])
         } else {
             return null
         }
@@ -230,7 +230,7 @@ open class FlipSearchActivity : AppCompatActivity() {
         if (nextsIndex >= -1 && (nextsIndex + 1) < nexts.size) {
             needSaving = true
             nextsIndex += 1
-            return MainActivity.database.get(nexts[nextsIndex])
+            return MainActivity.database.getName(nexts[nextsIndex])
         } else {
             return null
         }

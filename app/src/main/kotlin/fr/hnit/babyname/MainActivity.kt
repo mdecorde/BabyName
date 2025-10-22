@@ -336,7 +336,7 @@ class MainActivity : UpdateViewListener, AppCompatActivity() {
 
         val buffer = StringBuffer()
         for (id in ids) {
-            buffer.append("${database.get(id).name}: ${project.scores[id]}\n")
+            buffer.append("${database.getName(id).name}: ${project.scores[id]}\n")
         }
 
         if (ids.isEmpty()) {

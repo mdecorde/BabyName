@@ -218,7 +218,7 @@ class EditActivity : AppCompatActivity() {
 
         val newNexts = mutableListOf<Int>()
         for (i in 0 until MainActivity.database.size()) {
-            if (project.isNameValid(MainActivity.database.get(i))) {
+            if (project.isNameValid(MainActivity.database.getName(i))) {
                 newNexts.add(i)
             }
         }

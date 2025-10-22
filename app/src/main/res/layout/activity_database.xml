@@ -23,24 +23,34 @@
             android:text="@string/button_export" />
 
         <Button
-            android:id="@+id/ImportAddButton"
+            android:id="@+id/AddButton"
             android:layout_width="160dp"
             android:layout_height="wrap_content"
             android:layout_margin="14dp"
             android:backgroundTint="@color/colorPrimary"
             android:textSize="20sp"
             android:layout_weight="1"
-            android:text="@string/button_import_add" />
+            android:text="@string/button_add" />
 
         <Button
-            android:id="@+id/ImportReplaceButton"
+            android:id="@+id/ReplaceButton"
             android:layout_width="160dp"
             android:layout_height="wrap_content"
             android:backgroundTint="@color/colorPrimary"
             android:layout_margin="14dp"
             android:textSize="20sp"
             android:layout_weight="1"
-            android:text="@string/button_import_replace" />
+            android:text="@string/button_replace" />
+
+        <Button
+            android:id="@+id/ResetButton"
+            android:layout_width="160dp"
+            android:layout_height="wrap_content"
+            android:backgroundTint="@color/colorPrimary"
+            android:layout_margin="14dp"
+            android:textSize="20sp"
+            android:layout_weight="1"
+            android:text="@string/button_reset" />
 
     </LinearLayout>
 

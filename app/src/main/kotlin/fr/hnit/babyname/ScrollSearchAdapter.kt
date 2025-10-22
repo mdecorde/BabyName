@@ -29,7 +29,7 @@ class ScrollSearchAdapter(private val scrollActivity: ScrollSearchActivity,
         //Log.d(this, "onBindViewHolder $position")
 
         val index = nexts[position]
-        val babyName = MainActivity.database.get(index)
+        val babyName = MainActivity.database.getName(index)
 
         holder.rankView.text = "${position + 1}."
         holder.textView.text = scrollActivity.getHighlightedName(babyName.name)

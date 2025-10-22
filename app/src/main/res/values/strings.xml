@@ -13,11 +13,13 @@
     <string name="boy">Boy</string>
     <string name="boy_name">A boy which</string>
     <string name="boy_or_girl_name">A boy or a girl which</string>
+    <string name="button_abort">Abort</string>
     <string name="button_drop_20_percent">Drop 20%</string>
     <string name="button_drop_percent">Drop last %d%%</string>
     <string name="button_export">Export</string>
-    <string name="button_import_add">Import\n&amp;\nAdd</string>
-    <string name="button_import_replace">Import\n&amp;\nReplace</string>
+    <string name="button_add">Add</string>
+    <string name="button_replace">Replace</string>
+    <string name="button_reset">Reset</string>
     <string name="button_sort">Sort</string>
     <string name="copy">Copy</string>
     <string name="delete">Delete</string>

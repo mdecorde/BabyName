@@ -71,7 +71,7 @@ class BabyNameProject() : Serializable {
         if (bestScoreIndex == -1) {
             return null
         } else {
-            return MainActivity.database.get(bestScoreIndex)
+            return MainActivity.database.getName(bestScoreIndex)
         }
     }
 
