@@ -25,7 +25,7 @@
     <string name="copy">Copier</string>
     <string name="delete">Effacer</string>
     <string name="delete_question_content">Voulez vous vraiment vraimen vraiment supprimer cette recherche?</string>
-    <string name="delete_question_title">Supprimer le projet babyname</string>
+    <string name="delete_question_title">Supprimer la recherche</string>
     <string name="description_best_match_is">Le meilleur prénom est \'%s\'.</string>
     <string name="description_matches_with">match avec \'%s\'.</string>
     <string name="description_origin_are">les origines sont %s</string>
@@ -43,18 +43,26 @@
     <string name="gender_all">Tous</string>
     <string name="gender_neutral">Neutre</string>
     <string name="gender_female">Féminin</string>
+    <string name="gender_female_description">Prénom féminin.</string>
     <string name="gender_male">Masculin</string>
+    <string name="gender_male_description">Prénom masculin.</string>
     <string name="gender_unisex">Unisexe</string>
+    <string name="gender_unisex_description">Prénom masculin ou féminin.</string>
     <string name="gender_mostly_male">Majoritairement Masculin</string>
+    <string name="gender_mostly_male_description">Si en premier prénom, Prénom masculin, sinon : prénom plutôt masculin.</string>
     <string name="gender_mostly_female">Majoritairement Féminin</string>
+    <string name="gender_mostly_female_description">Si en premier prénom, Prénom féminin, sinon : prénom plutôt féminin.</string>
     <string name="gender_somewhat_male">Plutôt Masculin</string>
+    <string name="gender_somewhat_male_description">Prénom unisexe souvent plutôt masculin.</string>
     <string name="gender_somewhat_female">Plutôt Féminin</string>
+    <string name="gender_somewhat_female_description">Prénom unisexe souvent plutôt féminin.</string>
     <string name="genre">Genre :</string>
     <string name="girl">Fille</string>
     <string name="girl_name">Une file dont le nom</string>
     <string name="go">C\'est parti !</string>
     <string name="home_text">Projets de nom de bébé \n(cliquer sur \'Nouveau\' pour commencer)</string>
     <string name="keep_existing_names">Garder %d des prénoms :</string>
+    <string name="legend">Légende</string>
     <string name="menu_abort">Annuler</string>
     <string name="menu_about">À propos</string>
     <string name="menu_database">Base de données</string>
@@ -83,7 +91,7 @@
     <string name="no_remaining_loop">Il n\'y a plus de nom à noter (loop=%d). Recommencer un tour avec %d des noms?</string>
     <string name="ok">OK</string>
     <string name="origin_item_great_britain">Grande Bretagne</string>
-    <string name="origin_item_ireland">Ireland</string>
+    <string name="origin_item_ireland">Irelande</string>
     <string name="origin_item_usa">U.S.A.</string>
     <string name="origin_item_italy">Italie</string>
     <string name="origin_item_malta">Malte</string>
@@ -133,7 +141,7 @@
     <string name="origin_item_turkmenistan">Turkmenistan</string>
     <string name="origin_item_uzbekistan">Uzbekistan</string>
     <string name="origin_item_turkey">Turque</string>
-    <string name="origin_item_arabia_persia">Perse/Persia</string>
+    <string name="origin_item_arabia_persia">Arabe/Perse</string>
     <string name="origin_item_israel">Israel</string>
     <string name="origin_item_china">Chine</string>
     <string name="origin_item_india">Inde</string>
