@@ -108,7 +108,7 @@
         <Button
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
-            android:layout_margin="8dp"
+            android:layout_margin="4dp"
             android:layout_weight="1"
             android:backgroundTint="@color/colorPrimary"
             android:text="@string/previous"
@@ -117,7 +117,7 @@
         <Button
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
-            android:layout_margin="8dp"
+            android:layout_margin="4dp"
             android:layout_weight="1"
             android:backgroundTint="@color/colorPrimary"
             android:text="@string/remove"
@@ -126,7 +126,7 @@
         <Button
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
-            android:layout_margin="8dp"
+            android:layout_margin="4dp"
             android:backgroundTint="@color/colorPrimary"
             android:layout_weight="1"
             android:text="@string/next"
