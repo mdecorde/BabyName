@@ -75,7 +75,7 @@
     <string name="menu_shuffle">Shuffle</string>
     <string name="message_no_name_to_review">No names to review!</string>
     <string name="n_name_left">%d left.</string>
-    <string name="name_pattern_malformed">Name pattern is malformed : \n%s</string>
+    <string name="name_pattern_malformed">Name pattern is malformed: \n%s</string>
     <string name="name_rated_score">%s rated: %.1f</string>
     <string name="name_was_removed">Name was removed from the list.</string>
     <string name="names_counter">(%d Names)</string>

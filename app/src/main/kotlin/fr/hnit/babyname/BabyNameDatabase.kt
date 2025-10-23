@@ -262,7 +262,7 @@ class BabyNameDatabase {
             val names = arrayListOf<BabyName>()
             val nameSet = hashSetOf<String>() // to find duplicates
             var lineNumber = 0
-            // Data header, may be muliple consecutive lines starting with '#'.
+            // Data header, may be multiple consecutive lines starting with '#'.
             var headerLine = 0
             var header = ""
 

@@ -153,8 +153,7 @@ class BabyNameProject() : Serializable {
         }
 
         val matchedOrigins = if (originsSelection.isNotEmpty()) {
-            val matches = name.origins.filter { it.name in originsSelection }
-            matches.ifEmpty {
+            name.origins.filter { it.name in originsSelection }.ifEmpty {
                 // can happen after we edit the project
                 name.origins.toList()
             }
