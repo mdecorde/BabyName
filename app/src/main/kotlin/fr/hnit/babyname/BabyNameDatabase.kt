@@ -10,7 +10,7 @@ import java.io.BufferedReader
 import java.io.InputStreamReader
 
 import fr.hnit.babyname.BabyName.Origin
-import fr.hnit.babyname.BabyName.OriginRarity
+import fr.hnit.babyname.BabyName.OriginFrequency
 import fr.hnit.babyname.BabyName.Gender
 import fr.hnit.babyname.BabyNameSettings.Companion.fileExists
 import fr.hnit.babyname.BabyNameSettings.Companion.readInternalFile
@@ -144,40 +144,40 @@ class BabyNameDatabase {
             }
         }
 
-        private fun parseRarity(rarity: String): OriginRarity? {
-            return when (rarity) {
-                "1" -> OriginRarity.RARITY_1 // very rare
-                "2" -> OriginRarity.RARITY_2
-                "3" -> OriginRarity.RARITY_3
-                "4" -> OriginRarity.RARITY_4
-                "5" -> OriginRarity.RARITY_5
-                "6" -> OriginRarity.RARITY_6
-                "7" -> OriginRarity.RARITY_7
-                "8" -> OriginRarity.RARITY_8
-                "9" -> OriginRarity.RARITY_9
-                "10" -> OriginRarity.RARITY_10
-                "11" -> OriginRarity.RARITY_11
-                "12" -> OriginRarity.RARITY_12
-                "13" -> OriginRarity.RARITY_13 // very common
+        private fun parseFrequency(frequency: String): OriginFrequency? {
+            return when (frequency) {
+                "1" -> OriginFrequency.FREQUENCY_1 // very rare
+                "2" -> OriginFrequency.FREQUENCY_2
+                "3" -> OriginFrequency.FREQUENCY_3
+                "4" -> OriginFrequency.FREQUENCY_4
+                "5" -> OriginFrequency.FREQUENCY_5
+                "6" -> OriginFrequency.FREQUENCY_6
+                "7" -> OriginFrequency.FREQUENCY_7
+                "8" -> OriginFrequency.FREQUENCY_8
+                "9" -> OriginFrequency.FREQUENCY_9
+                "10" -> OriginFrequency.FREQUENCY_10
+                "11" -> OriginFrequency.FREQUENCY_11
+                "12" -> OriginFrequency.FREQUENCY_12
+                "13" -> OriginFrequency.FREQUENCY_13 // very common
                 else -> null
             }
         }
 
-        private fun rarityString(rarity: OriginRarity): String {
-            return when (rarity) {
-                OriginRarity.RARITY_1 -> "1" // very rare
-                OriginRarity.RARITY_2 -> "2"
-                OriginRarity.RARITY_3 -> "3"
-                OriginRarity.RARITY_4 -> "4"
-                OriginRarity.RARITY_5 -> "5"
-                OriginRarity.RARITY_6 -> "6"
-                OriginRarity.RARITY_7 -> "7"
-                OriginRarity.RARITY_8 -> "8"
-                OriginRarity.RARITY_9 -> "9"
-                OriginRarity.RARITY_10 -> "10"
-                OriginRarity.RARITY_11 -> "11"
-                OriginRarity.RARITY_12 -> "12"
-                OriginRarity.RARITY_13 -> "13" // very common
+        private fun frequencyString(frequency: OriginFrequency): String {
+            return when (frequency) {
+                OriginFrequency.FREQUENCY_1 -> "1" // very rare
+                OriginFrequency.FREQUENCY_2 -> "2"
+                OriginFrequency.FREQUENCY_3 -> "3"
+                OriginFrequency.FREQUENCY_4 -> "4"
+                OriginFrequency.FREQUENCY_5 -> "5"
+                OriginFrequency.FREQUENCY_6 -> "6"
+                OriginFrequency.FREQUENCY_7 -> "7"
+                OriginFrequency.FREQUENCY_8 -> "8"
+                OriginFrequency.FREQUENCY_9 -> "9"
+                OriginFrequency.FREQUENCY_10 -> "10"
+                OriginFrequency.FREQUENCY_11 -> "11"
+                OriginFrequency.FREQUENCY_12 -> "12"
+                OriginFrequency.FREQUENCY_13 -> "13" // very common
             }
         }
 
@@ -207,8 +207,8 @@ class BabyNameDatabase {
         }
 
         private fun originString(origin: Origin): String {
-            if (origin.rarity != null) {
-                return "${origin.name}:${genderString(origin.gender)}:${rarityString(origin.rarity)}"
+            if (origin.frequency != null) {
+                return "${origin.name}:${genderString(origin.gender)}:${frequencyString(origin.frequency)}"
             } else {
                 return "${origin.name}:${genderString(origin.gender)}"
             }
@@ -231,12 +231,12 @@ class BabyNameDatabase {
                 } else if (tokens.size == 3) {
                     val originName = parseOriginName(tokens[0])
                     val originGender = parseGender(tokens[1])
-                    val originRarity = parseRarity(tokens[2])
-                    if (originName == null || originGender  == null || originRarity == null) {
+                    val originFrequency = parseFrequency(tokens[2])
+                    if (originName == null || originGender  == null || originFrequency == null) {
                         return null
                     }
 
-                    origins.add(Origin(originName, originGender, originRarity))
+                    origins.add(Origin(originName, originGender, originFrequency))
                 } else {
                     return null
                 }
@@ -247,10 +247,10 @@ class BabyNameDatabase {
 
         // Sort Origin Array in-line.
         private fun sortOrigins(origins: Array<Origin>): Array<Origin> {
-            // Sort by rarity first, then by name.
+            // Sort by frequency first, then by name.
             origins.sortWith { o1: Origin, o2: Origin ->
-                if (o1.rarity != null && o2.rarity != null && o1.rarity != o2.rarity) {
-                    o2.rarity.ordinal - o1.rarity.ordinal
+                if (o1.frequency != null && o2.frequency != null && o1.frequency != o2.frequency) {
+                    o2.frequency.ordinal - o1.frequency.ordinal
                 } else {
                     o1.name.compareTo(o2.name)
                 }

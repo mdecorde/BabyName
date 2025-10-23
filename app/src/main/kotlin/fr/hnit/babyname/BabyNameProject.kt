@@ -118,9 +118,9 @@ class BabyNameProject() : Serializable {
                 append(Origins.getLocaleOriginName(context, origin.name))
                 append(": ")
                 append(Origins.getLocaleOriginGender(context, origin.gender))
-                if (origin.rarity != null) {
+                if (origin.frequency != null) {
                     append(" (")
-                    append(BabyName.getRarityApproximation(origin.rarity))
+                    append(BabyName.getFrequencyApproximation(origin.frequency))
                     append(")")
                 }
                 append("\n")
@@ -132,7 +132,7 @@ class BabyNameProject() : Serializable {
     * Show a simplified origin information.
     * - Only origins that were used as match (4 at most).
     * - Show genders only as Male/Female/Unisex.
-    * - No rarity.
+    * - No frequency.
     */
     fun getShortOriginsString(context: Context, name: BabyName): String {
         fun showGender(gender: Gender): Boolean {
@@ -161,7 +161,7 @@ class BabyNameProject() : Serializable {
         } else {
             name.origins.toList()
         }
-        matchedOrigins.sortedBy { it.rarity }
+        matchedOrigins.sortedBy { it.frequency }
 
         val showNames = matchedOrigins.map { it.name }.distinct().take(4)
         val matchedOriginGenders = matchedOrigins.map { it.gender }.distinct()
