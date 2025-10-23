@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="about">Baby Name %s\n\nCette application vous permet de trouver le prénom préféré pour votre bébé parmi plus de 40 000 prénoms.\n\nCette application est entièrement open source (GPL 3.0 ou version ultérieure). Toute suggestion, aide ou question est la bienvenue. Consultez https://github.com/mdecorde/BabyName pour plus d\'informations.\n\nBase de données sous copyright 2007-2008 par Jörg MICHAEL, GFDL 1.2 ou version ultérieure.</string>
+    <string name="about_app">Baby Name %s\n\nCette application vous permet de trouver le prénom préféré pour votre bébé parmi plus de 40 000 prénoms.\n\nCette application est entièrement open source (GPL 3.0 ou version ultérieure). Toute suggestion, aide ou question est la bienvenue. Consultez https://github.com/mdecorde/BabyName pour plus d\'informations.\n\nBase de données sous copyright 2007–2008 par Jörg MICHAEL, GFDL 1.2 ou version ultérieure.</string>
     <string name="about_button">À propos</string>
     <string name="action_delete_baby">Effacer</string>
-    <string name="action_dig_baby">Trouver un prénom...</string>
+    <string name="action_dig_baby">Trouver un prénom…</string>
     <string name="action_new_baby">Nouveau</string>
     <string name="action_reset_baby">Remise à zéro</string>
     <string name="action_save_babyproject">OK</string>
@@ -83,7 +83,7 @@
     <string name="no_remaining_loop">Il n\'y a plus de nom à noter (loop=%d). Recommencer un tour avec %d des noms?</string>
     <string name="ok">OK</string>
     <string name="origin_item_great_britain">Grande Bretagne</string>
-    <string name="origin_item_ireland">Ireland/string>
+    <string name="origin_item_ireland">Ireland</string>
     <string name="origin_item_usa">U.S.A.</string>
     <string name="origin_item_italy">Italie</string>
     <string name="origin_item_malta">Malte</string>
