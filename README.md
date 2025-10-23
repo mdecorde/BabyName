@@ -1,6 +1,6 @@
 # Baby Name Android Application
 
-This app helps you to find out your baby name within from a lexicon of +60000 names (From https://www.heise.de/ct/ftp/07/17/182/).
+This app helps you to find out your baby name within from a lexicon of +60000 names.
 
 If you're thinking about changing your name — for a transition or any other reason — this app can also help you choose the name you want to reborn with ;)
 
