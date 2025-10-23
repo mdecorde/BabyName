@@ -10,7 +10,7 @@ import java.io.BufferedReader
 import java.io.InputStreamReader
 
 import fr.hnit.babyname.BabyName.Origin
-import fr.hnit.babyname.BabyName.OriginFrequency
+import fr.hnit.babyname.BabyName.Frequency
 import fr.hnit.babyname.BabyName.Gender
 import fr.hnit.babyname.BabyNameSettings.Companion.fileExists
 import fr.hnit.babyname.BabyNameSettings.Companion.readInternalFile
@@ -144,40 +144,40 @@ class BabyNameDatabase {
             }
         }
 
-        private fun parseFrequency(frequency: String): OriginFrequency? {
+        private fun parseFrequency(frequency: String): Frequency? {
             return when (frequency) {
-                "1" -> OriginFrequency.FREQUENCY_1 // very rare
-                "2" -> OriginFrequency.FREQUENCY_2
-                "3" -> OriginFrequency.FREQUENCY_3
-                "4" -> OriginFrequency.FREQUENCY_4
-                "5" -> OriginFrequency.FREQUENCY_5
-                "6" -> OriginFrequency.FREQUENCY_6
-                "7" -> OriginFrequency.FREQUENCY_7
-                "8" -> OriginFrequency.FREQUENCY_8
-                "9" -> OriginFrequency.FREQUENCY_9
-                "10" -> OriginFrequency.FREQUENCY_10
-                "11" -> OriginFrequency.FREQUENCY_11
-                "12" -> OriginFrequency.FREQUENCY_12
-                "13" -> OriginFrequency.FREQUENCY_13 // very common
+                "1" -> Frequency.FREQUENCY_1 // very rare
+                "2" -> Frequency.FREQUENCY_2
+                "3" -> Frequency.FREQUENCY_3
+                "4" -> Frequency.FREQUENCY_4
+                "5" -> Frequency.FREQUENCY_5
+                "6" -> Frequency.FREQUENCY_6
+                "7" -> Frequency.FREQUENCY_7
+                "8" -> Frequency.FREQUENCY_8
+                "9" -> Frequency.FREQUENCY_9
+                "10" -> Frequency.FREQUENCY_10
+                "11" -> Frequency.FREQUENCY_11
+                "12" -> Frequency.FREQUENCY_12
+                "13" -> Frequency.FREQUENCY_13 // very common
                 else -> null
             }
         }
 
-        private fun frequencyString(frequency: OriginFrequency): String {
+        private fun frequencyString(frequency: Frequency): String {
             return when (frequency) {
-                OriginFrequency.FREQUENCY_1 -> "1" // very rare
-                OriginFrequency.FREQUENCY_2 -> "2"
-                OriginFrequency.FREQUENCY_3 -> "3"
-                OriginFrequency.FREQUENCY_4 -> "4"
-                OriginFrequency.FREQUENCY_5 -> "5"
-                OriginFrequency.FREQUENCY_6 -> "6"
-                OriginFrequency.FREQUENCY_7 -> "7"
-                OriginFrequency.FREQUENCY_8 -> "8"
-                OriginFrequency.FREQUENCY_9 -> "9"
-                OriginFrequency.FREQUENCY_10 -> "10"
-                OriginFrequency.FREQUENCY_11 -> "11"
-                OriginFrequency.FREQUENCY_12 -> "12"
-                OriginFrequency.FREQUENCY_13 -> "13" // very common
+                Frequency.FREQUENCY_1 -> "1" // very rare
+                Frequency.FREQUENCY_2 -> "2"
+                Frequency.FREQUENCY_3 -> "3"
+                Frequency.FREQUENCY_4 -> "4"
+                Frequency.FREQUENCY_5 -> "5"
+                Frequency.FREQUENCY_6 -> "6"
+                Frequency.FREQUENCY_7 -> "7"
+                Frequency.FREQUENCY_8 -> "8"
+                Frequency.FREQUENCY_9 -> "9"
+                Frequency.FREQUENCY_10 -> "10"
+                Frequency.FREQUENCY_11 -> "11"
+                Frequency.FREQUENCY_12 -> "12"
+                Frequency.FREQUENCY_13 -> "13" // very common
             }
         }
 

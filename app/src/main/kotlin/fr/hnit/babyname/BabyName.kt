@@ -11,7 +11,7 @@ class BabyName(var id: Int, var name: String, var origins: Array<Origin>, val he
     var soundex = generateSoundex(name)
 
     // from very rare (1) to very common (13)
-    enum class OriginFrequency {
+    enum class Frequency {
         FREQUENCY_1, // 0.00390625..0.0078125% of the population
         FREQUENCY_2, // 0.0078125..0.015625%
         FREQUENCY_3, // 0.015625..0.03125%
@@ -27,7 +27,7 @@ class BabyName(var id: Int, var name: String, var origins: Array<Origin>, val he
         FREQUENCY_13 // 16..32%
     }
 
-    data class Origin(val name: String, val gender: Gender, val frequency: OriginFrequency?)
+    data class Origin(val name: String, val gender: Gender, val frequency: Frequency?)
 
     enum class Gender {
         MALE, // M: male first name
@@ -40,22 +40,22 @@ class BabyName(var id: Int, var name: String, var origins: Array<Origin>, val he
     }
 
     companion object {
-        fun getFrequencyApproximation(frequency: OriginFrequency?): String {
+        fun getFrequencyApproximation(frequency: Frequency?): String {
             // Approximate ratio of the middle of the frequency bracket
             return when (frequency) {
-                OriginFrequency.FREQUENCY_1 -> "1:19200" // 0.00390625% - 0.0078125%
-                OriginFrequency.FREQUENCY_2 -> "1:9600" // 0.0078125% - 0.015625%
-                OriginFrequency.FREQUENCY_3 -> "1:4800" // 0.015625% - 0.03125%
-                OriginFrequency.FREQUENCY_4 -> "1:2400" // 0.03125% - 0.0625%
-                OriginFrequency.FREQUENCY_5 -> "1:1200" // 0.0625% - 0.125%s
-                OriginFrequency.FREQUENCY_6 -> "1:600" // 0.125% - 0.25%
-                OriginFrequency.FREQUENCY_7 -> "1:300" // 0.25% - 0.5%
-                OriginFrequency.FREQUENCY_8 -> "1:150" // 0.5% - 1.0%
-                OriginFrequency.FREQUENCY_9 -> "1:75" // 1.0% - 2.0%
-                OriginFrequency.FREQUENCY_10 -> "1:37" // 2.0% - 4.0%
-                OriginFrequency.FREQUENCY_11 -> "1:18" // 4.0% - 8.0%
-                OriginFrequency.FREQUENCY_12 -> "1:9" // 8.0% - 16%
-                OriginFrequency.FREQUENCY_13 -> "1:4" // 16% - 32%
+                Frequency.FREQUENCY_1 -> "1:19200" // 0.00390625% - 0.0078125%
+                Frequency.FREQUENCY_2 -> "1:9600" // 0.0078125% - 0.015625%
+                Frequency.FREQUENCY_3 -> "1:4800" // 0.015625% - 0.03125%
+                Frequency.FREQUENCY_4 -> "1:2400" // 0.03125% - 0.0625%
+                Frequency.FREQUENCY_5 -> "1:1200" // 0.0625% - 0.125%s
+                Frequency.FREQUENCY_6 -> "1:600" // 0.125% - 0.25%
+                Frequency.FREQUENCY_7 -> "1:300" // 0.25% - 0.5%
+                Frequency.FREQUENCY_8 -> "1:150" // 0.5% - 1.0%
+                Frequency.FREQUENCY_9 -> "1:75" // 1.0% - 2.0%
+                Frequency.FREQUENCY_10 -> "1:37" // 2.0% - 4.0%
+                Frequency.FREQUENCY_11 -> "1:18" // 4.0% - 8.0%
+                Frequency.FREQUENCY_12 -> "1:9" // 8.0% - 16%
+                Frequency.FREQUENCY_13 -> "1:4" // 16% - 32%
                 null -> "1:?"
             }
         }
