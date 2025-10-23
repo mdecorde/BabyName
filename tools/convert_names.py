@@ -147,9 +147,9 @@ header = [
 names = {}
 references = {}
 
-def hasDuplicateOrigins(origins):
-    originNames = list(map(lambda e: e.split(":")[0], origins))
-    return len(set(originNames)) != len(originNames)
+def hasDuplicateOrigins(origins1, origins2):
+    originNames1 = list(map(lambda e: e.split(":")[0] + e.split(":")[1], origins1))
+    originNames2 = list(map(lambda e: e.split(":")[0] + e.split(":")[1], origins2))
 
 with open(input_path, encoding='iso-8859-1') as file:
     text = file.read()
@@ -164,6 +164,10 @@ with open(input_path, encoding='iso-8859-1') as file:
         sort = line[29]
 
         if sort == "+":
+            continue
+
+        if len(name) == 0:
+            print(f"[Warning] empty line: {line}")
             continue
 
         origins = []
@@ -186,16 +190,13 @@ with open(input_path, encoding='iso-8859-1') as file:
         if gender != "=":
             for m in mapNames(name):
                 if m in names:
+                    if hasDuplicateOrigins(names[m], origins):
+                        print(f"[Warning] conflicting origins for {m}: {names[m]} vs. {origins}")
                     names[m].extend(origins)
-                    if hasDuplicateOrigins(names[m]):
-                        print(m)
-                        print(names[m])
-                        #assert(0)
                 else:
                     names[m] = list(origins)
         else:
-            #print(line)
-            #assert(name not in references)
+            # short/long name information
             references[name] = origins
 
 
