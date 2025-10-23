@@ -28,7 +28,7 @@ interface UpdateViewListener {
 
 class MainActivity : UpdateViewListener, AppCompatActivity() {
     private lateinit var projectListView: ListView
-    private lateinit var noBabyTextView: TextView
+    private lateinit var backgroundTextView: TextView
     private lateinit var adapter: ProjectListAdapter
     private lateinit var builder: AlertDialog.Builder
 
@@ -37,7 +37,7 @@ class MainActivity : UpdateViewListener, AppCompatActivity() {
         setContentView(R.layout.activity_main)
 
         projectListView = findViewById(R.id.projectListView)
-        noBabyTextView = findViewById(R.id.noBabyTextView)
+        backgroundTextView = findViewById(R.id.backgroundTextView)
 
         registerForContextMenu(projectListView)
 
@@ -121,17 +121,19 @@ class MainActivity : UpdateViewListener, AppCompatActivity() {
     }
 
     private fun updateNoBabyMessage() {
-
         if (projects_isLoaded) {
             if (projects.isEmpty()) {
-                noBabyTextView.visibility = View.VISIBLE
+                backgroundTextView.text = getString(R.string.no_baby)
+                backgroundTextView.visibility = View.VISIBLE
                 projectListView.visibility = View.GONE
             } else {
-                noBabyTextView.visibility = View.GONE
+                backgroundTextView.text = ""
+                backgroundTextView.visibility = View.GONE
                 projectListView.visibility = View.VISIBLE
             }
         } else {
-            noBabyTextView.visibility = View.GONE
+            backgroundTextView.text = getString(R.string.loading)
+            backgroundTextView.visibility = View.VISIBLE
             projectListView.visibility = View.GONE
         }
     }

@@ -8,9 +8,8 @@
     <TextView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:id="@+id/noBabyTextView"
+        android:id="@+id/backgroundTextView"
         android:visibility="gone"
-        android:text="@string/no_baby"
         android:textSize="32sp"
         android:gravity="center"
     />
