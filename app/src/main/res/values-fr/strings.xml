@@ -63,6 +63,7 @@
     <string name="home_text">Projets de nom de bébé \n(cliquer sur \'Nouveau\' pour commencer)</string>
     <string name="keep_existing_names">Garder %d des prénoms :</string>
     <string name="legend">Légende</string>
+    <string name="loading">Chargement…</string>
     <string name="menu_abort">Annuler</string>
     <string name="menu_about">À propos</string>
     <string name="menu_database">Base de données</string>
