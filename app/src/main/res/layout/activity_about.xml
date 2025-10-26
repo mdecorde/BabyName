@@ -27,6 +27,7 @@
                 android:text="@string/legend"
                 android:textStyle="bold"
                 android:gravity="center"
+                android:layout_marginBottom="5dp"
                 android:layout_weight="1" />
         </TableRow>
 
