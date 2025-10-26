@@ -283,7 +283,7 @@ class ScrollSearchActivity : AppCompatActivity() {
             var counter = 0
             for (next in nexts) {
                 val item = MainActivity.database.getName(next)
-                if (isMatch(item.name, sortPattern)) {
+                if (getMatches(item.name, sortPattern).isNotEmpty()) {
                     counter += 1
                 }
             }
@@ -415,15 +415,6 @@ class ScrollSearchActivity : AppCompatActivity() {
                 }
             }
             return maxScore
-        }
-
-        private fun isMatch(value: String, patterns: List<String>): Boolean {
-            for (p in patterns) {
-                if (value.indexOf(p) == -1) {
-                    return false
-                }
-            }
-            return true
         }
 
         // return array of matching ranges as array of begin,length pairs
