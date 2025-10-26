@@ -434,13 +434,13 @@ class ScrollSearchActivity : AppCompatActivity() {
                 matches.add(Match(i, p.length))
             }
 
-            matches.sortBy { it.begin  }
+            matches.sortBy { it.begin }
 
             // merge overlapping ranges
             var prev : Match? = null
             val ranges = mutableListOf<Match>()
             for (m in matches) {
-                if (prev != null && m.begin <= prev.begin + prev.length) {
+                if (prev != null && m.begin <= (prev.begin + prev.length)) {
                     val length = prev.length.coerceAtLeast(m.begin + m.length - prev.begin);
                     prev = Match(prev.begin, length)
                 } else {
