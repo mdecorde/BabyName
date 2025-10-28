@@ -33,7 +33,7 @@ internal object Origins {
             "France" -> R.string.origin_item_france
             "Belgium" -> R.string.origin_item_belgium
             "Luxembourg" -> R.string.origin_item_luxembourg
-            "Netherlands" -> R.string.origin_item_netherlands
+            "the Netherlands" -> R.string.origin_item_netherlands
             "East Frisia" -> R.string.origin_item_east_frisia
             "Germany" -> R.string.origin_item_germany
             "Austria" -> R.string.origin_item_austria
