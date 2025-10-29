@@ -256,7 +256,7 @@ class BabyNameProject() : Serializable {
             }
         }
 
-        fun readProject(filename: String?, context: Context): BabyNameProject? {
+        fun readProject(filename: String, context: Context): BabyNameProject? {
             var project: BabyNameProject? = null
             try {
                 val fis = context.openFileInput(filename)
