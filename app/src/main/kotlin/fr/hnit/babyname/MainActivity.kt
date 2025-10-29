@@ -106,17 +106,16 @@ class MainActivity : UpdateViewListener, AppCompatActivity() {
 
     override fun onResume() {
         updateView()
+        storeProjects()
         super.onResume()
     }
 
     override fun onPause() {
-        storeProjects()
         super.onPause()
     }
 
     override fun onDestroy() {
         instance = null
-        storeProjects()
         super.onDestroy()
     }
 
