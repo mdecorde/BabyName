@@ -1,0 +1,3 @@
+* udpated french translation
+* extend help text in about view
+* fix counter in scroll search
