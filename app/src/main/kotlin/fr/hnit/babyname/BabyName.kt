@@ -40,7 +40,7 @@ class BabyName(var id: Int, var name: String, var origins: Array<Origin>, val he
     }
 
     companion object {
-        fun getFrequencyApproximation(frequency: Frequency?): String {
+        fun getFrequencyApproximation(frequency: Frequency): String {
             // Approximate ratio of the middle of the frequency bracket
             return when (frequency) {
                 Frequency.FREQUENCY_1 -> "1:19200" // 0.00390625% - 0.0078125%
@@ -56,7 +56,6 @@ class BabyName(var id: Int, var name: String, var origins: Array<Origin>, val he
                 Frequency.FREQUENCY_11 -> "1:18" // 4.0% - 8.0%
                 Frequency.FREQUENCY_12 -> "1:9" // 8.0% - 16%
                 Frequency.FREQUENCY_13 -> "1:4" // 16% - 32%
-                null -> "1:?"
             }
         }
 
