@@ -5,8 +5,10 @@
 
 package fr.hnit.babyname
 
+import android.app.Activity
 import android.content.ClipData
 import android.content.ClipboardManager
+import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.view.ContextMenu
@@ -80,22 +82,6 @@ class MainActivity : UpdateViewListener, AppCompatActivity() {
         instance = this
     }
 
-    private fun storeProjects() {
-        for (project in projects) {
-            if (!project.needSaving) {
-                continue
-            }
-
-            if (!BabyNameProject.storeProject(project, this)) {
-                Toast.makeText(
-                    applicationContext,
-                    "Error: could not save changes to babyname project: $project",
-                    Toast.LENGTH_LONG
-                ).show()
-            }
-        }
-    }
-
     override fun updateView() {
         if (this::adapter.isInitialized) {
             adapter.notifyDataSetChanged()
@@ -106,7 +92,7 @@ class MainActivity : UpdateViewListener, AppCompatActivity() {
 
     override fun onResume() {
         updateView()
-        storeProjects()
+        storeProjects(this)
         super.onResume()
     }
 
@@ -396,5 +382,23 @@ class MainActivity : UpdateViewListener, AppCompatActivity() {
         val projects = ArrayList<BabyNameProject>()
         var projects_isLoaded = false
         var instance: UpdateViewListener? = null
+
+        fun storeProjects(ctx: Activity) {
+            for (project in projects) {
+                if (!project.needSaving) {
+                    continue
+                }
+
+                if (!BabyNameProject.storeProject(project, ctx)) {
+                    ctx.runOnUiThread {
+                        Toast.makeText(
+                            ctx,
+                            "Error: could not save changes to babyname project: $project",
+                            Toast.LENGTH_LONG
+                        ).show()
+                    }
+                }
+            }
+        }
     }
 }

@@ -151,6 +151,7 @@ class DatabaseActivity : AppCompatActivity() {
         thread(start = true) {
             try {
                 MainActivity.database.resetDatabase(applicationContext)
+                MainActivity.storeProjects(this)
                 runOnUiThread {
                     Toast.makeText(this, "Database reset done.", Toast.LENGTH_LONG).show()
                 }
@@ -182,11 +183,13 @@ class DatabaseActivity : AppCompatActivity() {
             if (doAdd) {
                 MainActivity.database.addNames(names)
                 val newCount = MainActivity.database.size()
+                MainActivity.storeProjects(this)
                 runOnUiThread {
                     Toast.makeText(this, "Added ${newCount - oldCount} names. $newCount total.", Toast.LENGTH_LONG).show()
                 }
             } else {
                 MainActivity.database.setNames(names)
+                MainActivity.storeProjects(this)
                 val newCount = MainActivity.database.size()
                 runOnUiThread {
                     Toast.makeText(this, "Replaced database with $newCount names.", Toast.LENGTH_LONG).show()
