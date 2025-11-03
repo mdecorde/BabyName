@@ -34,26 +34,17 @@ class BabyNameDatabase {
     fun resetDatabase(ctx: Context) {
         // Overwrite database with database from assets.
         val csv = BufferedReader(InputStreamReader(ctx.assets.open("babynames_original.csv")))
-            .use (BufferedReader::readText)
-        val names = deserializeNames(csv)
-        setNames(names)
-        saveDatabase(ctx)
+            .use(BufferedReader::readText)
+        writeInternalFile(ctx, DATABASE_PATH, csv.toByteArray())
+        loadDatabase(ctx)
     }
 
     fun loadDatabase(ctx: Context) {
-        val csv = readInternalFile(ctx, DATABASE_PATH)
-        val names = deserializeNames(String(csv, Charsets.UTF_8))
+        val databaseBytes = readInternalFile(ctx, DATABASE_PATH)
+        val databaseString = String(databaseBytes, Charsets.UTF_8)
+        val names = deserializeNames(databaseString)
         //Log.d(this, "Loaded ${allNames.size} names")
         setNames(names)
-    }
-
-    fun saveDatabase(ctx: Context) {
-        val csv = serializeNames(allNames)
-        writeInternalFile(ctx, DATABASE_PATH, csv.toByteArray())
-    }
-
-    fun getAll(): ArrayList<BabyName> {
-        return allNames
     }
 
     fun getName(index: Int): BabyName {
@@ -65,41 +56,103 @@ class BabyNameDatabase {
         return allNames.size
     }
 
-    fun addNames(newNames: ArrayList<BabyName>) {
-        val names = arrayListOf<BabyName>()
-        names.addAll(allNames)
-        names.addAll(newNames)
-        setNames(names)
+    fun addDatabase(ctx: Context, addDatabaseBytes: ByteArray) {
+        val addDatabaseString = String(addDatabaseBytes, 0, addDatabaseBytes.size)
+        val databaseBytes = readInternalFile(ctx, DATABASE_PATH)
+        val newNames = deserializeNames(addDatabaseString)
+        if (newNames.isNotEmpty()) {
+            writeInternalFile(ctx, DATABASE_PATH,
+                databaseBytes, "\n".toByteArray(), addDatabaseBytes)
+            loadDatabase(ctx)
+        } else {
+            throw Exception("Empty Database")
+        }
+    }
+
+    fun setDatabase(ctx: Context, databaseBytes: ByteArray) {
+        val databaseString = String(databaseBytes, 0, databaseBytes.size)
+        val newNames = deserializeNames(databaseString)
+        if (newNames.isNotEmpty()) {
+            writeInternalFile(ctx, DATABASE_PATH, databaseBytes)
+            loadDatabase(ctx)
+        } else {
+            throw Exception("Empty Database")
+        }
+    }
+
+    private fun mergeBabyNames(first: BabyName, second: BabyName): BabyName {
+        assert(first.name == second.name)
+        val firstOrigins = first.origins
+        val secondOrigins = second.origins
+        val origins = ArrayList<Origin>()
+        for (firstOrigin in firstOrigins) {
+            val secondOrigin = secondOrigins.firstOrNull { it.name == firstOrigin.name }
+            if (secondOrigin == null) {
+                origins.add(firstOrigin)
+            } else {
+                if (firstOrigin.gender == secondOrigin.gender) {
+                    if (firstOrigin.frequency == secondOrigin.frequency) {
+                        origins.add(firstOrigin)
+                    } else if (firstOrigin.frequency == null) {
+                        origins.add(secondOrigin)
+                    } else if (secondOrigin.frequency == null) {
+                        origins.add(firstOrigin)
+                    } else {
+                        // conflicting data, take first
+                        origins.add(firstOrigin)
+                    }
+                } else {
+                    // conflicting data, take first
+                    origins.add(firstOrigin)
+                }
+            }
+        }
+        origins.sortBy { it.name }
+        return BabyName(first.id, first.name, origins.toTypedArray())
     }
 
     // The input is expected to be a sorted and distinct list
-    fun setNames(newNames: ArrayList<BabyName>) {
-        // sort for binary search
-        newNames.sortBy { it.name }
+    fun setNames(newNamesInput: ArrayList<BabyName>) {
+        // sort to find duplicates and for binary search
+        newNamesInput.sortBy { it.name }
+
+        // merge duplicate names
+        val newNames = ArrayList<BabyName>()
+        for (name in newNamesInput) {
+            val last = newNames.lastOrNull()
+            if (last != null && name.name == last.name) {
+                val mergedName = mergeBabyNames(last, name)
+                newNames[newNames.lastIndex] = mergedName
+            } else {
+                newNames.add(name)
+            }
+        }
 
         // fix all indices
         for (id in newNames.indices) {
             newNames[id].id = id
         }
 
-        // record id changes
-        val map = HashMap<Int, Int>()
+        if (allNames.isNotEmpty()) {
+            // record id changes
+            val map = HashMap<Int, Int>()
 
-        for (oldIndex in allNames.indices) {
-            val oldName = allNames[oldIndex]
-            val newIndex = newNames.binarySearchBy(oldName.name) { it.name }
-            if (newIndex < 0) {
-                // name does not exist anymore
-                map[oldIndex] = -1
-            } else {
-                // index changed
-                map[oldIndex] = newIndex
+            for (oldIndex in allNames.indices) {
+                val oldName = allNames[oldIndex]
+                val newIndex = newNames.binarySearchBy(oldName.name) { it.name }
+                if (newIndex < 0) {
+                    // name does not exist anymore
+                    map[oldIndex] = -1
+                } else {
+                    // index changed
+                    map[oldIndex] = newIndex
+                }
             }
-        }
 
-        // update projects
-        for (project in MainActivity.projects) {
-            project.updateIDs(map)
+            // update projects
+            for (project in MainActivity.projects) {
+                project.updateIDs(map)
+            }
         }
 
         // set new names as last step
@@ -260,11 +313,7 @@ class BabyNameDatabase {
 
         fun deserializeNames(text: String): ArrayList<BabyName> {
             val names = arrayListOf<BabyName>()
-            val nameSet = hashSetOf<String>() // to find duplicates
             var lineNumber = 0
-            // Data header, may be multiple consecutive lines starting with '#'.
-            var headerLine = 0
-            var header = ""
 
             var offset = 0
             var run = true
@@ -284,18 +333,7 @@ class BabyNameDatabase {
                 lineNumber += 1
 
                 // Skip empty lines.
-                if (line.isEmpty()) {
-                    continue
-                }
-
-                // Collect header.
-                if (line.startsWith("#")) {
-                    if ((headerLine + 1) == lineNumber && header.isNotEmpty()) {
-                        header += "\n" + line
-                    } else {
-                        header = line
-                    }
-                    headerLine = lineNumber
+                if (line.isEmpty() || line.startsWith("#")) {
                     continue
                 }
 
@@ -316,42 +354,20 @@ class BabyNameDatabase {
                     throw Exception("Invalid origin in line $lineNumber: ${getExcerpt(line)}")
                 }
 
-                if (name in nameSet) {
-                    throw Exception("Duplicate name in line $lineNumber: ${getExcerpt(line)}")
-                }
-
-                if (origins.map { it.name }.distinct().size != origins.size) {
+                if (origins.map { originString(it) }.distinct().size != origins.size) {
                     throw Exception("Duplicate origin in line $lineNumber: ${getExcerpt(line)}")
                 }
 
-                names.add(BabyName(names.size, name, origins, header))
+                names.add(BabyName(names.size, name, origins))
             }
 
             return names
         }
 
+/*
         fun serializeNames(names: ArrayList<BabyName>): String {
-            // Clone names list.
-            val all = names.toMutableList()
-
-            // Sort by header first, name second.
-            all.sortWith { n1: BabyName, n2: BabyName ->
-                if (n1.header != n2.header) {
-                    n1.header.compareTo(n2.header)
-                } else {
-                    n1.name.compareTo(n2.name)
-                }
-            }
-
             return buildString {
-                var header = ""
-                for (name in all) {
-                    if (name.header != header) {
-                        append(name.header)
-                        append("\n")
-                        header = name.header
-                    }
-
+                for (name in names) {
                     append(name.name)
                     append(";")
                     append(
@@ -362,5 +378,6 @@ class BabyNameDatabase {
                 }
             }
         }
+ */
     }
 }

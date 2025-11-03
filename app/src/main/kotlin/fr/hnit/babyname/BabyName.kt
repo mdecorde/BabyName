@@ -7,7 +7,7 @@ package fr.hnit.babyname
 
 import java.io.Serializable
 
-class BabyName(var id: Int, var name: String, var origins: Array<Origin>, val header: String) : Serializable {
+class BabyName(var id: Int, var name: String, var origins: Array<Origin>) : Serializable {
     var soundex = generateSoundex(name)
 
     // from very rare (1) to very common (13)

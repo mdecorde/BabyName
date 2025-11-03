@@ -55,7 +55,7 @@ class BabyNameSettings() {
             return file.exists() && file.isFile
         }
 
-        fun writeInternalFile(ctx: Context, fileName: String, dataArray: ByteArray) {
+        fun writeInternalFile(ctx: Context, fileName: String, vararg dataArrays: ByteArray) {
             val file = File(ctx.filesDir, fileName)
             if (file.exists() && file.isFile) {
                 if (!file.delete()) {
@@ -64,7 +64,9 @@ class BabyNameSettings() {
             }
             file.createNewFile()
             val fos = FileOutputStream(file)
-            fos.write(dataArray)
+            for (dataArray in dataArrays) {
+                fos.write(dataArray)
+            }
             fos.close()
         }
 

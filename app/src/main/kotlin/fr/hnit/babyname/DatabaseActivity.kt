@@ -16,6 +16,8 @@ import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
+import fr.hnit.babyname.BabyNameDatabase.Companion.DATABASE_PATH
+import fr.hnit.babyname.BabyNameSettings.Companion.readInternalFile
 import java.io.ByteArrayOutputStream
 import java.text.SimpleDateFormat
 import java.util.Date
@@ -121,16 +123,13 @@ class DatabaseActivity : AppCompatActivity() {
 
             thread(start = true) {
                 try {
-                    val names = MainActivity.database.getAll()
-                    val csv = BabyNameDatabase.serializeNames(names)
-                    val count = MainActivity.database.size()
-
+                    val csv = readInternalFile(applicationContext, DATABASE_PATH)
                     val fos = contentResolver.openOutputStream(uri)
-                    fos!!.write(csv.toByteArray())
+                    fos!!.write(csv)
                     fos.close()
 
                     runOnUiThread {
-                        Toast.makeText(this, "Exported $count entries.", Toast.LENGTH_LONG).show()
+                        Toast.makeText(this, "Exported ${csv.size} bytes.", Toast.LENGTH_LONG).show()
                     }
                 } catch (e: Exception) {
                     runOnUiThread {
@@ -177,18 +176,16 @@ class DatabaseActivity : AppCompatActivity() {
     private fun importDatabase(uri: Uri, doAdd: Boolean) {
         try {
             val byteData = readFile(this, uri)
-            val stringData = String(byteData, 0, byteData.size)
             val oldCount = MainActivity.database.size()
-            val names = BabyNameDatabase.deserializeNames(stringData)
             if (doAdd) {
-                MainActivity.database.addNames(names)
+                MainActivity.database.addDatabase(applicationContext, byteData)
                 val newCount = MainActivity.database.size()
                 MainActivity.storeProjects(this)
                 runOnUiThread {
                     Toast.makeText(this, "Added ${newCount - oldCount} names. $newCount total.", Toast.LENGTH_LONG).show()
                 }
             } else {
-                MainActivity.database.setNames(names)
+                MainActivity.database.setDatabase(applicationContext, byteData)
                 MainActivity.storeProjects(this)
                 val newCount = MainActivity.database.size()
                 runOnUiThread {
