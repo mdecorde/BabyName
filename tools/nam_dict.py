@@ -7,15 +7,8 @@ Script to process 0717-182/nam_dict.txt from https://www.heise.de/ct/ftp/07/17/1
 License of data: GFDL-1.2-or-later
 '''
 
-if len(sys.argv) != 3:
-    print(f"Usage: {sys.argv[0]} <input-file> <output-file>")
-    print()
-    print("This script processes 0717-182/nam_dict.txt")
-    print("from https://www.heise.de/ct/ftp/07/17/182/")
-    exit(1)
-
-input_path = sys.argv[1]
-output_path = sys.argv[2] 
+input_path = "nam_dict.txt"
+output_path = "converted_nam_dict.txt"
 
 
 # returns percent value
@@ -143,7 +136,7 @@ header = [
 ]
 
 names = {}
-references = {}
+alternatives = {}
 
 def hasDuplicateOrigins(origins1, origins2):
     originNames1 = list(map(lambda e: e.split(":")[0] + e.split(":")[1], origins1))
@@ -195,7 +188,7 @@ with open(input_path, encoding='iso-8859-1') as file:
                     names[m] = list(origins)
         else:
             # short/long name information
-            references[name] = origins
+            alternatives[name] = line
 
 
 '''
