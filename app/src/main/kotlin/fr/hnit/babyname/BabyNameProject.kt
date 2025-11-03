@@ -90,6 +90,7 @@ class BabyNameProject() : Serializable {
 
                 // invalidate
                 nextsIndex = -1
+                needSaving = true
             } else {
                 // no change
                 newNexts.add(next)
@@ -107,6 +108,7 @@ class BabyNameProject() : Serializable {
                 } else {
                     // name deleted
                 }
+                needSaving = true
             }
         }
         scores = newScores
