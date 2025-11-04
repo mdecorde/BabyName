@@ -1,5 +1,5 @@
 <resources>
-    <style name="AlertDialogTheme" parent="Theme.MaterialComponents.Light.Dialog.Alert">
+    <style name="AlertDialogTheme" parent="Theme.MaterialComponents.DayNight.Dialog.Alert">
         <item name="buttonBarPositiveButtonStyle">@style/Alert.Button</item>
         <item name="buttonBarNegativeButtonStyle">@style/Alert.Button</item>
         <item name="buttonBarNeutralButtonStyle">@style/Alert.Button</item>
@@ -10,7 +10,7 @@
         <item name="android:textColor">@color/accent_material_light</item>
     </style>
 
-    <style name="AppTheme" parent="Theme.MaterialComponents.Light">
+    <style name="AppTheme" parent="Theme.MaterialComponents.DayNight">
         <item name="android:fitsSystemWindows">true</item>
         <item name="android:windowTranslucentStatus">true</item>
         <item name="android:windowTranslucentNavigation">true</item>
