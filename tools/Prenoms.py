@@ -201,11 +201,11 @@ for o in ori:
 for o in ori:
     ident = o.lower().replace(" ", "_")
     print(f'"{o}" -> R.string.origin_item_{ident}')
+'''
 
 for name in entries:
     # make origins distinct
     entries[name] = list(set(entries[name]))
-'''
 
 def toLines(entries):
   lines = []
