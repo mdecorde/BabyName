@@ -102,7 +102,7 @@ originColums = ["Great Britain", "Ireland", "U.S.A.", "Italy", "Malta", "Portuga
 
 def translateOrigin(origin):
     if origin == "other countries":
-        return "other"
+        return "Unknown"
     return origin
 
 def mapNames(name):

@@ -83,7 +83,7 @@ internal object Origins {
             "Japan" -> R.string.origin_item_japan
             "Korea" -> R.string.origin_item_korea
             "Vietnam" -> R.string.origin_item_vietnam
-            "other" -> R.string.origin_item_other
+            "Unknown" -> R.string.origin_item_unknown
             // Origins used in Prenom.txt database file
             "Ancient Celtic" -> R.string.origin_item_ancient_celtic
             "Ancient Egyptian" -> R.string.origin_item_ancient_egyptian
