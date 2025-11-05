@@ -21,15 +21,23 @@
             android:layout_gravity="center"
             android:src="@drawable/filter" />
 
-        <EditText
+        <LinearLayout
             android:layout_width="0sp"
-            android:layout_height="match_parent"
-            android:layout_gravity="center"
-            android:autofillHints="name"
-            android:inputType="textFilter"
-            android:layout_weight="0.4"
+            android:layout_height="wrap_content"
             android:background="@drawable/edit_text_border"
-            android:id="@+id/filter_text" />
+            android:layout_weight="0.4">
+
+            <EditText
+                android:layout_height="match_parent"
+                android:layout_width="match_parent"
+                android:layout_marginHorizontal="5dp"
+                android:layout_gravity="center"
+                android:autofillHints="name"
+                android:background="@android:color/transparent"
+                android:inputType="textFilter"
+                android:id="@+id/filter_text"/>
+
+        </LinearLayout>
 
         <TextView
             android:layout_width="0sp"
