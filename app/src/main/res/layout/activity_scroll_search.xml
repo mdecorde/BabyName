@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/main"
     android:layout_width="match_parent"
@@ -29,6 +28,7 @@
             android:autofillHints="name"
             android:inputType="textFilter"
             android:layout_weight="0.4"
+            android:background="@drawable/edit_text_border"
             android:id="@+id/filter_text" />
 
         <TextView
