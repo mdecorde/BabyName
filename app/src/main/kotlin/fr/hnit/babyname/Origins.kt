@@ -23,6 +23,7 @@ internal object Origins {
 
     fun getLocaleOriginName(ctx: Context, originName: String): String {
         val id = when (originName) {
+            // Origins used in nam_dict.txt database file
             "Great Britain" -> R.string.origin_item_great_britain
             "Ireland" -> R.string.origin_item_ireland
             "U.S.A." -> R.string.origin_item_usa
