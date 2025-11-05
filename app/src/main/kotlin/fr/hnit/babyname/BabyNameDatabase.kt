@@ -82,31 +82,42 @@ class BabyNameDatabase {
 
     private fun mergeBabyNames(first: BabyName, second: BabyName): BabyName {
         assert(first.name == second.name)
-        val firstOrigins = first.origins
-        val secondOrigins = second.origins
+
+        val originNames = first.origins.map { it.name }.toSet() + second.origins.map { it.name }.toSet()
         val origins = ArrayList<Origin>()
-        for (firstOrigin in firstOrigins) {
-            val secondOrigin = secondOrigins.firstOrNull { it.name == firstOrigin.name }
-            if (secondOrigin == null) {
-                origins.add(firstOrigin)
-            } else {
-                if (firstOrigin.gender == secondOrigin.gender) {
-                    if (firstOrigin.frequency == secondOrigin.frequency) {
-                        origins.add(firstOrigin)
-                    } else if (firstOrigin.frequency == null) {
-                        origins.add(secondOrigin)
-                    } else if (secondOrigin.frequency == null) {
-                        origins.add(firstOrigin)
+
+        for (originName in originNames) {
+            val firstOrigin = first.origins.firstOrNull { it.name == originName }
+            val secondOrigin = second.origins.firstOrNull { it.name == originName }
+            if (firstOrigin != null) {
+                if (secondOrigin != null) {
+                    if (firstOrigin.gender == secondOrigin.gender) {
+                        if (firstOrigin.frequency == secondOrigin.frequency) {
+                            origins.add(firstOrigin)
+                        } else if (firstOrigin.frequency == null) {
+                            origins.add(secondOrigin)
+                        } else if (secondOrigin.frequency == null) {
+                            origins.add(firstOrigin)
+                        } else {
+                            // conflicting data, take first
+                            origins.add(firstOrigin)
+                        }
                     } else {
                         // conflicting data, take first
                         origins.add(firstOrigin)
                     }
                 } else {
-                    // conflicting data, take first
                     origins.add(firstOrigin)
+                }
+            } else {
+                if (secondOrigin != null) {
+                    origins.add(secondOrigin)
+                } else {
+                    continue
                 }
             }
         }
+
         origins.sortBy { it.name }
         return BabyName(first.id, first.name, origins.toTypedArray())
     }
