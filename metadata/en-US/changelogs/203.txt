@@ -1,0 +1,3 @@
+* add support for dark mode
+* add back about 900 names from backgrounds such as
+  ancient, mythological, historical, astronomy, literature
