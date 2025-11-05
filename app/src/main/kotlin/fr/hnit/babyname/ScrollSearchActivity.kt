@@ -5,6 +5,7 @@
 
 package fr.hnit.babyname
 
+import android.content.res.Configuration
 import android.graphics.Color
 import android.os.Bundle
 import android.text.SpannableString
@@ -362,9 +363,11 @@ class ScrollSearchActivity : AppCompatActivity() {
         if (sortPattern.isEmpty()) {
             return ss
         } else {
+            val uiMode = resources?.configuration?.uiMode?.and(Configuration.UI_MODE_NIGHT_MASK)
+            val markColor = if (uiMode == Configuration.UI_MODE_NIGHT_YES) { Color.DKGRAY } else { Color.YELLOW }
             val matches = getMatches(name, sortPattern)
             for (m in matches) {
-                ss.setSpan(BackgroundColorSpan(Color.YELLOW), m.begin, m.begin + m.length, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+                ss.setSpan(BackgroundColorSpan(markColor), m.begin, m.begin + m.length, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
             }
             return ss
         }
