@@ -10,13 +10,6 @@ file and converts it to the Baby Name app format.
 input_path = "Prenoms.txt"
 output_path = "converted_Prenoms.txt"
 
-# translate special char sequences to UTF-8
-def translateName(name):
-    for key, value in translations.items():
-        if key in name:
-            name = name.replace(key, chr(value))
-    return name
-
 header = [
     "# Based on data produced by Mike Campbell and Boris New",
     "# See http://www.lexique.org/public/prenoms.php",
@@ -25,46 +18,133 @@ header = [
 
 def translateOrigin(origin):
     originMap = {
-        'english (modern)': 'English', 'finnish': 'Finland', 'english': 'English', 'spanish': 'Spain', 'biblical': 'Bible',
-        'irish': 'Ireland', 'arabic': 'Arabia/Persia', 'jewish': 'Israel', 'hungarian': 'Hungary', 'french': 'France',
-        'danish': 'Denmark', 'african': 'Africa', 'indian': 'India', 'german': 'Germany', 'biblical (variant)': 'Bible',
-        'ancient greek (latinized)': 'Greece', 'greek mythology (latinized)': 'Greek mythology', 'italian': 'Italy',
-        'swedish': 'Sweden', '': 'other', 'ancient germanic': 'Ancient Germanic', 'portuguese': 'Portugal', 'polish': 'Poland',
-        'russian': 'Russia', 'romanian': 'Romania', 'dutch': 'Netherlands', 'turkish': 'Turkey', 'astronomy': 'Astronomy',
-        'history': 'History', 'theology': 'Theology', 'greek mythology': 'Greek mythology', 'esperanto': 'Esperanto',
-        'anglo-saxon': 'Anglo-Saxon', 'ancient roman': 'Ancient Roman', 'roman mythology': 'roman mythology', 'welsh': 'Wales',
-        'welsh mythology': 'welsh mythology', 'ancient greek (anglicized)': 'Ancient Greek (anglicized)', 'greek': 'Greece',
-        'ancient greek': 'ancient greek', 'czech': 'Czech Republic', 'slovene': 'Slovene', 'armenian': 'Armenia',
-        'scandinavian': 'Scandinavia', 'latvian': 'Latvia', 'celtic mythology': 'celtic mythology', 'chinese': 'China',
-        'near eastern mythology': 'near eastern mythology', 'native american': 'native american', 'japanese': 'Japan',
-        'scottish': 'Scotland', 'irish mythology': 'rish mythology', 'basque': 'Basque', 'hawaiian': 'Hawaii', 'norwegian': 'Norway',
-        'bulgarian': 'Bulgaria', 'macedonian': 'Macedonian', 'croatian': 'Croatia', 'serbian': 'Serbia', 'albanian': 'Albania',
-        'ancient scandinavian': 'Ancient Scandinavian', 'iranian': 'Iran', 'norse mythology': 'norse mythology', 'slovak': 'slovak',
-        'late roman': 'late roman', 'far eastern mythology': 'far eastern mythology', 'egyptian mythology': 'egyptian mythology',
-        'ancient egyptian': 'Ancient Egyptian', 'egyptian mythology (hellenized)': 'egyptian mythology (hellenized)',
-        'provençal': 'Provençal', 'catalan': 'Catalan', 'near eastern mythology (hellenized)': 'near eastern mythology (hellenized)',
-        'literature': 'Literature', 'maori': 'Maori', 'ukrainian': 'Ukraine', 'icelandic': 'Iceland', 'breton': 'Breton',
-        'lithuanian': 'Lithuanian', 'hindu mythology': 'hindu mythology', 'judeo-christian legend': 'Judeo-Christian Legends',
-        'vietnamese': 'Vietnam', 'celtic mythology (latinized)': 'celtic mythology (latinized)', 'anglo-saxon mythology': 'anglo-saxon mythology',
-        'manx': 'Manx', 'cornish': 'Cornish', 'ancient celtic (latinized)': 'ancient celtic (latinized)', 'khmer': 'Khmer',
-        'ancient celtic': 'Ancient Celtic', 'germanic mythology': 'germanic mythology', 'slavic mythology': 'slavic mythology',
-        'ancient germanic (latinized)': 'ancient germanic (latinized)', 'new world mythology': 'new world mythology', '?': 'other',
-        'frisian': 'East Frisian', 'anglo-saxon (latinized)': 'anglo-saxon (latinized)',
-        'greek mythology (anglicized)': 'greek mythology (anglicized)', 'korean': 'Korea', 'estonian': 'Estonia', 'thai': 'Thai',
-        'medieval english': 'medieval english', 'mormon': 'Mormon', 'biblical (original)': 'biblical (original)', 'mythology': 'Mythology',
-        'galician': 'Galician'
+        '': 'Unknown',
+        '?': 'Unknown',
+        'african': 'Africa',
+        'albanian': 'Albania',
+        'ancient celtic': 'Ancient Celtic',
+        #'ancient celtic (latinized)': 'ancient celtic (latinized)',
+        'ancient egyptian': 'Ancient Egyptian',
+        'ancient germanic': 'Ancient Germanic',
+        #'ancient germanic (latinized)': 'ancient germanic (latinized)',
+        'ancient greek': 'Ancient Greek',
+        #'ancient greek (anglicized)': 'Ancient Greek (anglicized)',
+        #'ancient greek (latinized)': 'Greece',
+        'ancient roman': 'Ancient Rome',
+        'ancient scandinavian': 'Ancient Scandinavia',
+        'anglo-saxon': 'Anglo-Saxon',
+        #'anglo-saxon (latinized)': 'anglo-saxon (latinized)',
+        'anglo-saxon mythology': 'Anglo-Saxon Mythology',
+        'arabic': 'Arabia/Persia',
+        'armenian': 'Armenia',
+        'astronomy': 'Astronomy',
+        'basque': 'Basque',
+        'biblical': 'biblical',
+        #'biblical (original)': 'Bible',
+        #'biblical (variant)': 'Bible',
+        'breton': 'Bretagne',
+        'bulgarian': 'Bulgaria',
+        'catalan': 'Catalan',
+        'celtic mythology': 'Celtic Mythology',
+        #'celtic mythology (latinized)': 'Celtic Mythology (latinized)',
+        'chinese': 'China',
+        'cornish': 'Cornwall',
+        'croatian': 'Croatia',
+        'czech': 'Czech Republic',
+        'danish': 'Denmark',
+        'dutch': 'Netherlands',
+        'egyptian mythology': 'Egyptian Mythology',
+        #'egyptian mythology (hellenized)': 'egyptian mythology (hellenized)',
+        'english': 'England',
+        #'english (modern)': 'English',
+        'esperanto': 'Esperanto',
+        'estonian': 'Estonia',
+        'far eastern mythology': 'Far Eastern Mythology',
+        'finnish': 'Finland',
+        'french': 'France',
+        'frisian': 'East Frisian',
+        'galician': 'Galicia',
+        'german': 'Germany',
+        'germanic mythology': 'Germanic Mythology',
+        'greek': 'Greece',
+        'greek mythology': 'Greek Mythology',
+        #'greek mythology (anglicized)': 'Greek Mythology (anglicized)',
+        #'greek mythology (latinized)': 'Greek Mythology',
+        'hawaiian': 'Hawaii',
+        'hindu mythology': 'Hindu Mythology',
+        'history': 'History',
+        'hungarian': 'Hungary',
+        'icelandic': 'Iceland',
+        'indian': 'India',
+        'iranian': 'Iran',
+        'irish': 'Ireland',
+        'irish mythology': 'Irish Mythology',
+        'italian': 'Italy',
+        'japanese': 'Japan',
+        'jewish': 'Israel',
+        'judeo-christian legend': 'Judeo-Christian Legends',
+        'khmer': 'Khmer',
+        'korean': 'Korea',
+        'late roman': 'Late Roman',
+        'latvian': 'Latvia',
+        'literature': 'Literature',
+        'lithuanian': 'Lithuania',
+        'macedonian': 'Macedonia',
+        'manx': 'Isle of Man',
+        'maori': 'Maori',
+        'medieval english': 'England',
+        'mormon': 'Mormon',
+        'mythology': 'Mythology',
+        'native american': 'Native American',
+        'near eastern mythology': 'Near Eastern Mythology',
+        #'near eastern mythology (hellenized)': 'Near Eastern Mythology',
+        'new world mythology': 'New World Mythology',
+        'norse mythology': 'Norse Mythology',
+        'norwegian': 'Norway',
+        'polish': 'Poland',
+        'portuguese': 'Portugal',
+        'provençal': 'Provençal',
+        'roman mythology': 'Roman Mythology',
+        'romanian': 'Romania',
+        'russian': 'Russia',
+        'scandinavian': 'Scandinavia',
+        'scottish': 'Scotland',
+        'serbian': 'Serbia',
+        'slavic mythology': 'Slavic Mythology',
+        'slovak': 'Slovak',
+        'slovene': 'Slovene',
+        'spanish': 'Spain',
+        'swedish': 'Sweden',
+        'thai': 'Thai',
+        'theology': 'Theology',
+        'turkish': 'Turkey',
+        'ukrainian': 'Ukraine',
+        'vietnamese': 'Vietnam',
+        'welsh': 'Wales',
+        'welsh mythology': 'Welsh Mythology'
     }
 
-    return originMap[origin]
+    if " (" in origin:
+        origin = origin[0:origin.index(" (")]
+
+    if origin.endswith(" mythology"):
+        return [originMap[origin], "Mythology"]
+
+    if origin.startswith("ancient "):
+        return [originMap[origin], "Ancient"]
+
+    return [originMap[origin]]
 
 def parseOrigins(origins):
     ret = []
     for origin in origins.split(", "):
-        ret.append(translateOrigin(origin))
-    return ret
+        ret.extend(translateOrigin(origin))
+
+    # let's only keep Mythology/Ancient/.. names from this database
+    return [x for x in ret if ("Mythology" in x or "Ancient" in x or "Literature" in x or "Astronomy" in x or "History" in x)]
 
 def parseName(name):
-    return name.replace(" (1)", "").replace(" (2)", "").replace(" (3)", "").capitalize()
+    return name.replace(" (1)", "").replace(" (2)", "").replace(" (3)", "").replace("'", "").capitalize()
 
 def translateGender(gender):
     if gender == "m":
@@ -94,6 +174,9 @@ with open(input_path, encoding='iso-8859-1') as file:
         originNames = parseOrigins(toks[2].strip())
         frequency = toks[3].strip()
 
+        if len(originNames) == 0:
+            continue
+
         origins = []
         for originName in originNames:
             origins.append(f"{originName}:{gender}")
@@ -103,9 +186,26 @@ with open(input_path, encoding='iso-8859-1') as file:
         else:
             entries[name] = origins
 
+'''
+# Generate Kotlin Code
+
+ori = set()
+for name, origins in entries.items():
+    for origin in origins:
+        ori.add(origin.split(":")[0])
+
+for o in ori:
+    ident = o.lower().replace(" ", "_").replace("-", "_")
+    print(f'<string name="origin_item_{ident}">{o}</string>')
+
+for o in ori:
+    ident = o.lower().replace(" ", "_")
+    print(f'"{o}" -> R.string.origin_item_{ident}')
+
 for name in entries:
     # make origins distinct
     entries[name] = list(set(entries[name]))
+'''
 
 def toLines(entries):
   lines = []
