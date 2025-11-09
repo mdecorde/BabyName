@@ -1,0 +1,2 @@
+* denote compound names with a '+'
+  E.g. use "Jun+Wei" instead of "Jun Wei", "Jun-Wei" and "JunWei"
