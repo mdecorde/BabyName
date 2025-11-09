@@ -155,7 +155,6 @@
     <string name="origin_item_new_world_mythology">New World Mythology</string>
     <string name="origin_item_norse_mythology">Norse Mythology</string>
     <string name="origin_item_norway">Norway</string>
-    <string name="origin_item_unknown">Unknown</string>
     <string name="origin_item_poland">Poland</string>
     <string name="origin_item_portugal">Portugal</string>
     <string name="origin_item_roman_mythology">Roman Mythology</string>
@@ -173,6 +172,7 @@
     <string name="origin_item_turkey">Turkey</string>
     <string name="origin_item_turkmenistan">Turkmenistan</string>
     <string name="origin_item_ukraine">Ukraine</string>
+    <string name="origin_item_unknown">Unknown</string>
     <string name="origin_item_usa">U.S.A.</string>
     <string name="origin_item_uzbekistan">Uzbekistan</string>
     <string name="origin_item_vietnam">Vietnam</string>

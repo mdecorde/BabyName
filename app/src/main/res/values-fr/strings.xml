@@ -132,7 +132,6 @@
     <string name="origin_item_montenegro">Montenegro</string>
     <string name="origin_item_netherlands">Pays-Bas</string>
     <string name="origin_item_norway">Norvège</string>
-    <string name="origin_item_unknown">Autre</string>
     <string name="origin_item_poland">Pologne</string>
     <string name="origin_item_portugal">Portugale</string>
     <string name="origin_item_romania">Roumanie</string>
@@ -148,6 +147,7 @@
     <string name="origin_item_turkey">Turque</string>
     <string name="origin_item_turkmenistan">Turkmenistan</string>
     <string name="origin_item_ukraine">Ukraine</string>
+    <string name="origin_item_unknown">Autre</string>
     <string name="origin_item_usa">U.S.A.</string>
     <string name="origin_item_uzbekistan">Uzbekistan</string>
     <string name="origin_item_vietnam">Vietname</string>
