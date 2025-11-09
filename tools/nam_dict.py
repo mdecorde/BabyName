@@ -108,6 +108,7 @@ def translateOrigin(origin):
     return origin
 
 def mapNames(name):
+    '''
     if '+' in name:
         # E.g "Jun+Wei" represents the names "Jun-Wei", "Jun Wei" and "Junwei".
         ret = []
@@ -118,7 +119,8 @@ def mapNames(name):
         ret.append(tokens[0] + tokens[1])
         return ret
     else:
-        return [name]
+    '''
+    return [name]
 
 # translate special char sequences to UTF-8
 def translateName(name):

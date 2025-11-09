@@ -1,6 +1,9 @@
 <resources>
     <string name="about_app">Baby Name %s\n\nThis application allows you to find your favorite baby name from a collection of >40000 names.\n\nThis application is entirely Open-Source (GPL-3.0-or-later). Any suggestion, help or question is welcome. Visit https://github.com/mdecorde/BabyName for more information.\n\nDatabase under Copyright 2007-2008 by Jörg MICHAEL, GFDL-1.2-or-later.</string>
     <string name="about_button">About</string>
+    <string name="about_compound_names">A plus char (\'+\') "inside" a name symbolizes a \'-\', \' \' or an empty string. This usually applies to Arabic, Chinese and Korean names. Thus, "Jun+Wei" represents the names "Jun-Wei", "Jun Wei" and "Junwei".</string>
+    <string name="about_genders_title">Legend</string>
+    <string name="about_notes_title">Notes</string>
     <string name="action_delete_baby">Delete</string>
     <string name="action_dig_baby">Find name...</string>
     <string name="action_new_baby">New</string>
@@ -61,7 +64,6 @@
     <string name="go">Go</string>
     <string name="home_text">Baby name projects \n(click \'new\' to start a project)</string>
     <string name="keep_existing_names">Keep %d existing names:</string>
-    <string name="legend">Legend</string>
     <string name="loading">Loading…</string>
     <string name="menu_abort">Abort</string>
     <string name="menu_about">About</string>
